@@ -1,3 +1,9 @@
+# BTLE For Linux,  Raspberry PI
+## Raspberry PI BTLE C++ Library
+##
+###      BUNGET
+##### *beta-version_plus* 
+####### (Bunget, read 'ge' as in George)
 
 #### Build lib bunget and demo application
 
@@ -8,140 +14,309 @@
   * sudo apt-get install build-essential
   * sudo apt-get install libcrypto++-dev
   
- 
-### x86
+
+
+### Description:
+
+BUNGET is a C++ library for Linux which help to write GAP/GATT servers (Bluetooth 4.0). It provides abstract classes and methods to create GATT services, characteristics (READ/WRITE/NOTIFICATIONS). The library does not require the Bluez, but it requires some bluetooth utilities. The library was written from scratch. The idea of writing 'yet another BTLE implemetation' came after I spend days and days trying Bluez and Bleno. I could not get Blues working programatically and easy. Bleno is terible slow and tremendous resource eater, also brings entire java enciclopedia along with. 
+So: here is a simple C++ library which uses just a HCI socket and GAP/GATT protocol helping to write GATT services. 
+
+* Server only: GATT services characteristics, descriptors or beacons.
+* Characteristics: R W I N + Descriptors. 
+* Requires: hciconfig tool from blues package in /usr/bin
+* (iii).    Bunget lib will stop the bluetooth service.
+* (iiii) Read all documents.
+* Latest version is at: https://github.com/zirexix
+
+
+## Usage
+
+* Turn device running Linux system in to a GATT server. 
+   * Soon all specific dev platforms for embedded custom chips will be replaced by Linux, pretty soon...
+* Debug HCI clients
+
+## Block Diagram:
+
+![alt text](https://github.com/comarius/bunget/blob/master/docs/bungblk.png "bunget-lib")
+
+
+## Demo video
+
+ [![Alt text for your video](http://209.177.145.195/share/bungetpi.png)](http://209.177.145.195/share/bunget.mov)
+
+
+## Credits:
+Bluez, Bleno, StCube/BlueNrg, Bluetooth 4.0 Specs.
+
+
+##License:
+Free, for non commercial products, otherwise you need a written personalised license from the Author.
+
+
+### SDK:
+
+- See libbunget.h in the source tree
+- See main.cpp in the source tree
+
+* For services use 16 bit UUID's. Maximum 8 servics / 8 characteristics.
+* Do not mix UUIDS of 16 bytes with UUIDS of 128 bytes on the same running unit.
+* The GATT (services/charact./descr.) was tested only with 16 byte UUIDS.
+* Beacon advertising, needs 128 bit UUID's only.
+
+
+### Demo R-PI console (left). ArduUiPush APK Right 
+
+* ArduUiPush;No screens scanned and loaded for advertised name.
+
+![alt text](https://bitbucket.org/repo/4kLXA4/images/3493780247-gatt.png "bunget-demo")
+
+Check also: ArduUiPush demo: https://www.youtube.com/watch?v=Fw4yCe2ejNw
+
+## Class Diagram
+
+![alt text](https://github.com/zyraxes-com/bunget/blob/master/docs/bungetl.png "bunget-lib")
+
+
+## Issues Tweaks 
+
+* On different BTLE dongles the timing between receiving HCI event and sending back data disrupts the functionality.
+  * Build with DEBUG enabled. If after connection the progress stops around this TRACE:
+  ```javascript
+HCI: ACL_START 
+-->[16]0240200B0007000400100100FFFF0028 
+GATT DATA:ATT_OP_READ_BY_GROUP_REQ  
+my_proc event: onServicesDiscovered 
+  ```
+  * Tweak the receive<delay>send value at main line 127. . 
+  * My Broadcom dongle works with >16 ms delay on R-PI and with >2 ms on 4 quad HP Intel PC.
+  
+```javascript
+       IServer*    BS =  ctx->new_server(&procedure, dev, "advname", 0/* tweak delay*/);
+```
+* Descriptors for data type not suppotred yet. Use GATT registerred UUIDS or know your type on both ends.
+
+#### Code excerpt
 
 ```javascript
 
-cd libbunget
+#include <fstream>
+#include <iostream>
+#include <unistd.h>
+#include <stdio.h>
+#include <time.h>
+#include <assert.h>
+#include <uuid.h>
+#include <libbunget.h>
+
+using namespace std;
+using namespace bunget;
+
+
+#define UID_GPIO    0x3400
+#define UID_TIME    0x3401
+#define UID_TEMP    0x3403
+
+bool __alive = true;
+class my_proc : public ISrvProc
+{
+public:
+    my_proc();
+    void onServicesDiscovered(std::vector<IHandler*>& els); // called when remote discover services
+    void onReadRequest(IHandler* pc);                       // called when remote reads pc's value charact.
+    int evSubscribesNotify(IHandler* pc, bool b);           // called when remote writes notification descriptor !=0
+    void onIndicate(IHandler* pc);                          // called when remote wants pc's indicator value
+    void onWriteRequest(IHandler* pc);                      // called when remote writes pc charateristic
+    void onWriteDescriptor(IHandler* pc, IHandler* pd);     // called when remote writes pc's charact descriptor pd
+    void evAdvertise(bool onoff);                           // called when advertising turns on/off
+    void evDeviceState(bool onoff);                         //called when device dongle is plugged / unplugged (buggy still)
+    void evClientState(bool connected);                     // called when a client connects / disconnetcs 
+    bool evLoop(IServer* ps);                               //called when the hci-socket idles. Be short!. 
+                                                            // return false to break the run() blocking call.    
+
+private:
+    void        _prepare_gpio17();  // RPI specific, to control LEDS for the purpose of the demo
+    const char* _get_time();        // reads local time, and returns a string
+    float       _get_temp();        // reads temp,  on RPI. 
+    const char* _get_temp_s();      // same as above but returns a string
+    uint8_t     _get_gpio();        // reads GPIO status on RPI
+    void        _send_value(IHandler* pc);  // sends a value to GATT
+
+public:
+    char        _some[20];
+    bool        _subscribed;
+    IHandler*   LedChr;       // RW
+    IHandler*   TimeChr;      // NIR
+    IHandler*   Temp1Chr;     // NIR
+};
+
+
+
+int main(int n, char* v[])
+{
+    BtCtx*      ctx = BtCtx::instance();        // get singleton Bunget instance
+    my_proc     procedure;                      // callback  instance of above class
+
+    IServer*    BS =  ctx->new_server(&procedure, 0, "rpi-bunget", 0);      // one GATT server per hci device
+    IService*   ps = BS->add_service(0x123F,"demo");                        // add a service to the GATT server
+    
+    //
+    // add some characterisitcs
+    //
+    procedure.LedChr = ps->add_charact(UID_GPIO,PROPERTY_WRITE|PROPERTY_INDICATE|PROPERTY_NOTIFY,
+                             0,
+                             FORMAT_RAW, 1); // 1 / 0  // many per service
+
+    procedure.TimeChr = ps->add_charact(UID_TIME, PROPERTY_READ|PROPERTY_NOTIFY,
+                             0,
+                             FORMAT_RAW, 20); // we send it as string
+
+    procedure.Temp1Chr = ps->add_charact(UID_TEMP, PROPERTY_NOTIFY|PROPERTY_INDICATE,
+                              0,
+                              FORMAT_RAW, 20); // we send it as string 
+
+    try{
+        BS->advertise(true);
+        BS->run();
+    }
+    catch(hexecption& ex)
+    {
+        TRACE(ex.report());
+    }
+    return 0;
+}
+
+my_proc::my_proc()
+{
+    _subscribed=false;
+    _prepare_gpio17();
+}
+
+bool my_proc::evLoop(IServer* ps)
+{
+    static int inawhile=0;
+
+    // notification
+    if(_subscribed && inawhile++%600==0)
+    {
+        _send_value(TimeChr);
+        _send_value(Temp1Chr);
+    }
+    return true;
+}
+
+//  ... see main.cpp for the rest of the callback implenentation
+
+```
+#######################################################################
+#######################################################################
+
+H O W     TO   B U I L D 
+
+#######################################################################
+```javascript
 cmake .
 make
-cd ..
+cd bin
+# sun as root
+```
+
+#########################################################################
+### Raspberry PI Build (check compiler version )
+  - The C compiler identification is GNU 4.9.2
+  - Board: RPI-2
+  - Fresh distribution: Linux minibian 4.1.18-v7+ #846 SMP Thu Feb 25 14:22:53 GMT 2016 armv7l GNU/Linux
+  - Login as root/raspberry
+
+```javascript
+#
+# Prerequisites. Also required for new system
+#
+apt-get update
+apt-get install bluez # (needed for hciconfig utility for now)
+apt-get install cmake
+apt-get install  g++
+apt-get install  rfkill
+apt-get install libcrypto++-dev
+service bluetooth stop   # not mandatory
+update-rc.d -f  bluetooth remove   # not mandatory
+
+
+git clone https://github.com/comarius/bunget
+cd bunget
 cmake .
 make
-sudo ./bin/bunget HCI_DEVICCE_NUMBER
-// on Android mobile
-// install ArduiUiPush or BTLE explorer
-// connect
-// you can see the time in clear text.
-// temeprature as float
-// LED as R / W for RPI
-```
+cd bin
 
-
-### Raspbery PI
-```javascript
-// copy all on R-PI
-// install libcrypto++-dev
-// installl bluetooth utils or tools. Needs hciconfig and hcitool in root's path
-// copy libbunget/R-PI/* to /libbunget/*
-// copy R-PI/* to ./*
-// repeat as above
-```
-
-
-#### Fresh Linux Mint Installation Log
-```javascript
-
-/// 1. clone repo
-user@hph git clone https://github.com/comarius/bunget
-user@hph cd bunget/src/libbunget
-
-/// 2. goto libbunget and make
-user@hph ~/bunget/src/libbunget $ cmake .
--- The C compiler identification is GNU 4.8.4
--- The CXX compiler identification is GNU 4.8.4
--- Check for working C compiler: /usr/bin/cc
--- Check for working C compiler: /usr/bin/cc -- works
--- Detecting C compiler ABI info
--- Detecting C compiler ABI info - done
--- Check for working CXX compiler: /usr/bin/c++
--- Check for working CXX compiler: /usr/bin/c++ -- works
--- Detecting CXX compiler ABI info
--- Detecting CXX compiler ABI info - done
--- Configuring done
--- Generating done
--- Build files have been written to: /home/marius/bunget/src/libbunget
-
-user@hph ~/bunget/src/libbunget $ make 
-Scanning dependencies of target bunget
-[  6%] Building CXX object CMakeFiles/bunget.dir/ascon.cpp.o
-[ 13%] Building CXX object CMakeFiles/bunget.dir/bt_incinpl.cpp.o
-[ 20%] Building CXX object CMakeFiles/bunget.dir/bt_socket.cpp.o
-[ 26%] Building CXX object CMakeFiles/bunget.dir/bu_gap.cpp.o
-[ 33%] Building CXX object CMakeFiles/bunget.dir/bu_hci.cpp.o
-[ 40%] Building CXX object CMakeFiles/bunget.dir/bybuff.cpp.o
-[ 46%] Building CXX object CMakeFiles/bunget.dir/cryptos.cpp.o
-[ 53%] Building CXX object CMakeFiles/bunget.dir/gattdefs.cpp.o
-[ 60%] Building CXX object CMakeFiles/bunget.dir/hci_socket.cpp.o
-[ 66%] Building CXX object CMakeFiles/bunget.dir/l2cap_socket.cpp.o
-[ 73%] Building CXX object CMakeFiles/bunget.dir/libbungetpriv.cpp.o
-[ 80%] Building CXX object CMakeFiles/bunget.dir/rfcomm_socket.cpp.o
-[ 86%] Building CXX object CMakeFiles/bunget.dir/sco_socket.cpp.o
-[ 93%] Building CXX object CMakeFiles/bunget.dir/secmanp.cpp.o
-[100%] Building CXX object CMakeFiles/bunget.dir/uguid.cpp.o
-Linking CXX static library /home/marius/bunget/src/lib/libbunget.a
-[100%] Built target bunget
-
-/// 3. goto bunget and make
-user@hph ~/bunget/src/libbunget $ cd ..
-user@hph ~/bunget/src $ cmake .
--- The C compiler identification is GNU 4.8.4
--- The CXX compiler identification is GNU 4.8.4
--- Check for working C compiler: /usr/bin/cc
--- Check for working C compiler: /usr/bin/cc -- works
--- Detecting C compiler ABI info
--- Detecting C compiler ABI info - done
--- Check for working CXX compiler: /usr/bin/c++
--- Check for working CXX compiler: /usr/bin/c++ -- works
--- Detecting CXX compiler ABI info
--- Detecting CXX compiler ABI info - done
-CMake Warning (dev) at CMakeLists.txt:33 (link_directories):
-  This command specifies the relative path
-
-    ./lib
-
-  as a link directory.
-
-  Policy CMP0015 is not set: link_directories() treats paths relative to the
-  source dir.  Run "cmake --help-policy CMP0015" for policy details.  Use the
-  cmake_policy command to set the policy and suppress this warning.
-This warning is for project developers.  Use -Wno-dev to suppress it.
-
--- Configuring done
--- Generating done
--- Build files have been written to: /home/marius/bunget/src
-marius@hph ~/bunget/src $ make 
-Scanning dependencies of target bunget
-[100%] Building CXX object CMakeFiles/bunget.dir/main.cpp.o
-/home/user/bunget/src/main.cpp: In member function ‘const char* my_proc::_get_temp_s()’:
-/home/user/bunget/src/main.cpp:351:10: warning: unused variable ‘ftamp’ [-Wunused-variable]
-    float ftamp=0.0;
-          ^
-Linking CXX executable bin/bunget
-[100%] Built target bunget
-
-/// 2. find out hco device. My BT4 dongle is 5C:F3:70:6B:72:D6 which is hci1 -> 1
-user@hph ~/bunget/src $ hciconfig
-hci1:	Type: BR/EDR  Bus: USB
-	BD Address: 5C:F3:70:6B:72:D6  ACL MTU: 1021:8  SCO MTU: 64:1
-	UP RUNNING PSCAN 
-	RX bytes:612 acl:0 sco:0 events:37 errors:0
-	TX bytes:942 acl:0 sco:0 commands:37 errors:0
-
+#
+# check if the device is detected
+#
+root@minibian:~/bunget/src/bin# hciconfig
 hci0:	Type: BR/EDR  Bus: USB
-	BD Address: E0:2A:82:2F:D4:08  ACL MTU: 1021:8  SCO MTU: 64:1
-	UP RUNNING PSCAN 
-	RX bytes:1050 acl:0 sco:0 events:52 errors:0
-	TX bytes:1423 acl:0 sco:0 commands:52 errors:0
+	BD Address: 5C:F3:70:76:B2:B2  ACL MTU: 1021:8  SCO MTU: 64:1
+	DOWN 
+	RX bytes:616 acl:0 sco:0 events:34 errors:0
+	TX bytes:380 acl:0 sco:0 commands:34 errors:0
 
-/// start bunget on hci 1
-user@hph ~/bunget/src $ sudo ./bin/bunget 1
+# argument for hci0 is 0, for hci1 is 1 and so on
+# therefore we run our GATT server as
+
+./bunget 0
+
+
+root@minibian:~/bunget/src/bin# ./bunget 0
 sh: echo: I/O error
-chmod: cannot access ‘/sys/class/gpio/gpio17/*’: No such file or directory
-bluetoothd: unrecognized service
-bluetooth stop/waiting
-/// can connect and see time
-/// press q to exit
-^Cuser@hph ~/bunget/src $ 
+Failed to stop bluetoothd.service: Unit bluetoothd.service not loaded.
+my_proc event:  onAdvertized:0 
+my_proc event:  onDeviceStatus:1 
+my_proc event:  onAdvertized:1 
+#
+# here I connected the BTLE scanner phone and read all the characteristics
+#
+accepted: 5F:C9:32:F3:5D:F6,* 
+my_proc event: onServicesDiscovered 
+my_proc event:  onWriteDescriptor:1 
+my_proc event: onSubscribesNotify:3400=1 
+my_proc event:  onWriteDescriptor:1 
+my_proc event: onSubscribesNotify:3401=1 
+my_proc event:  onWriteDescriptor:1 
+my_proc event: onSubscribesNotify:3403=1 
+
+
 ```
+
+  
+### Issues
+- If nothing happen tweak the timout [0-64] in main ctx->new_server(&procedure, dev, hostname, <timeout>);
+
+### Tested on 
+####   R-PI 3
+  - Linux minibian 4.4.17-v7+ #901 SMP Fri Aug 12 17:57:27 BST 2016 armv7l GNU/Linux
+  - gcc (Raspbian 4.9.2-10) 4.9.2
+  - g++ (Raspbian 4.9.2-10) 4.9.2
+#### Ubuntu 16.04
+  - Linux X540LA (ACER) 4.4.0-47-generic #68-Ubuntu SMP Wed Oct 26 19:39:52 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+  - gcc (Ubuntu 4.8.5-4ubuntu2) 4.8.5
+  - g++ (Ubuntu 4.8.5-4ubuntu2) 4.8.5
+#### Linux Mint
+  - Linux hp 3.19.0-32-generic #37~14.04.1-Ubuntu SMP Thu Oct 22 09:41:40 UTC 2015 x86_64 x86_64 x86_64 GNU/Linux
+  - g++ (Ubuntu 4.8.4-2ubuntu1~14.04.3) 4.8.4
+  - gcc (Ubuntu 4.8.4-2ubuntu1~14.04.3) 4.8.4
+   
+#### Dongle USB used
+```
+[33544.074470] usb 4-1.2: new full-speed USB device number 5 using ehci-pci
+[33544.171100] usb 4-1.2: New USB device found, idVendor=0a5c, idProduct=21e8
+[33544.171108] usb 4-1.2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+[33544.171114] usb 4-1.2: Product: BCM20702A0
+[33544.171118] usb 4-1.2: Manufacturer: Broadcom Corp
+[33544.171123] usb 4-1.2: SerialNumber: 5CF3706B72D6
+[33544.172183] bluetooth hci1: Direct firmware load for brcm/BCM20702A0-0a5c-21e8.hcd failed with error -2
+[33544.172193] Bluetooth: hci1: BCM: patch brcm/BCM20702A0-0a5c-21e8.hcd not found
+```
+
+
+
+#######################################################################
+
+contact by eMail for any questions: marrius9876@gmail 
+*** Free for non commercial products only ***
