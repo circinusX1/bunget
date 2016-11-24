@@ -217,7 +217,7 @@ H O W     TO   B U I L D
 cmake .
 make
 cd bin
-# sun as root
+sudo ./bunget 0  (hci device number)
 ```
 
 #########################################################################
