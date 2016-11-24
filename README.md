@@ -323,5 +323,5 @@ my_proc event: onSubscribesNotify:3403=1
 
 #######################################################################
 
-Questions, Bugs, COmmercial usage: Contact by eMail for any questions: marrius9876@ g m a i   l . c  o  m
+Questions, Bugs, Commercial usage: Contact by eMail for any questions: marrius9876@ g m a i   l . c  o  m
 *** Free for non commercial products only ***
