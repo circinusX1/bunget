@@ -40,9 +40,9 @@ So: here is a simple C++ library which uses just a HCI socket and GAP/GATT proto
 ![alt text](https://github.com/comarius/bunget/blob/master/docs/bungblk.png "bunget-lib")
 
 
-## Demo video. If the image does not work use this link: http://209.177.145.195/share/bunget.mov
+#### Demo video. If the image does not work use this link: http://209.177.145.195/share/bunget.mov
 
- [![Alt text for your video](http://209.177.145.195/share/bungetpi.png)](http://209.177.145.195/share/bunget.mov)
+ [![Ipad BTLE demo video](http://209.177.145.195/share/bungetpi.png)](http://209.177.145.195/share/bunget.mov)
 
 
 ## Credits:
