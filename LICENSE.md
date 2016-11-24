@@ -1,7 +1,7 @@
 ### Non commercial License 
-######(Taken and adapted from SSH)
+###### (Taken and adapted from SSH)
 
-Non-commercial Version License agreement for BUNGET library
+##### Non-commercial Version License agreement for BUNGET library
 
 To qualify for a Non-Commercial Version License, You must:
 (1) use the Software solely on a system under the Linux,
@@ -34,12 +34,12 @@ the Software free of charge. BUNGET reserves the right to
 further clarify the terms Non-Commercial Entity, University
 Users and Excluded Contractor at its sole determination.
 
-If You do not qualify for a Non-Commercial Version
+####If You do not qualify for a Non-Commercial Version
 License, then You should discontinue the downloading or
 installation process and purchase a Commercial Use License
 or obtain an Evaluation License from the Author.
 
-GRANT OF LICENSE
+##### GRANT OF LICENSE
 
 Provided that you qualify for a Non-Commercial Version
 License as specified above, and subject to the terms and
@@ -73,19 +73,19 @@ modifications and derivative works that You create.
 For the avoidance of doubt, the following are considered
 examples of commercial uses of the Software:
 
-(1)	use at or for a commercial enterprise;
-(2)	use for financial gain, personal or otherwise;
-(3)	use by government agencies;
-(4)	use by a telecommunication or Internet service
+  -(1)	use at or for a commercial enterprise;
+  -(2)	use for financial gain, personal or otherwise;
+  -(3)	use by government agencies;
+  -(4)	use by a telecommunication or Internet service
 provider company;
-(5)	use at home or while traveling for work for which You
+  -(5)	use at home or while traveling for work for which You
 will be paid;
-(6)	use in connection with administering a commercial web
+  -(6)	use in connection with administering a commercial web
 site;
-(7)	use in connection with the provision of professional
+  -(7)	use in connection with the provision of professional
 service for which You are compensated (including paid
 system administration);
-(8)	bundling or integrating the Software with any hardware
+  -(8)	bundling or integrating the Software with any hardware
 product or another software product for commercial.
 
 BUNGET and/or its licensors reserve all rights not expressly
@@ -101,9 +101,9 @@ other ways, by the copyright laws of the United States and
 international copyright treaties. All rights not expressly
 granted herein are retained by BUNGET and its licensors.
 
-USE RESTRICTIONS
+##### USE RESTRICTIONS
 
-You may not: 
+###### You may not: 
 
 (i) use the Software, except under the terms listed above; 
 
@@ -140,14 +140,14 @@ Any and all copies made by You as permitted hereunder must
 contain all of the original Software's copyright, trademark
 and other proprietary notices and marks.
 
-MAINTENANCE, SUPPORT AND UPDATES
+##### MAINTENANCE, SUPPORT AND UPDATES
 
 BUNGET is under no obligation to maintain or support or
 update the Software in any way, or to provide updates or
 error corrections
 
 
-CONFIDENTIALITY
+##### CONFIDENTIALITY
 
 The Software and any license authorization codes are
 confidential and proprietary information of BUNGET. You agree
@@ -176,7 +176,7 @@ WARRANTIES, SO THE ABOVE EXCLUSION MAY NOT APPLY TO YOU,
 AND YOU MAY HAVE OTHER RIGHTS, WHICH VARY FROM STATE TO
 STATE.
 
-LIMITED LIABILITY
+##### LIMITED LIABILITY
 
 THE ENTIRE RISK AS TO RESULTS AND PERFORMANCE OF THE
 SOFTWARE IS ASSUMED BY YOU. UNDER NO CIRCUMSTANCES WILL BUNGET
@@ -213,7 +213,7 @@ AN APPLICATION IN WHICH THE FUNCTIONING OR MALFUNCTIONING
 OF THE SOFTWARE MAY RESULT DIRECTLY OR INDIRECTLY IN
 PHYSICAL INJURY OR LOSS OF HUMAN LIFE. 
 
-TERMINATION
+##### TERMINATION
 
 This Agreement will terminate immediately and
 automatically without notice if You breach any provision in
@@ -228,45 +228,13 @@ provisions of this Agreement, except for the license grant
 and warranty, will survive termination.
 U.S. GOVERNMENT RIGHTS
 
-If You use the Software by or for any unit or agency of
-the United States Government, this provision applies. The
-Software shall be classified as "commercial computer
-software", as that term is defined in the Federal
-Acquisition Regulation (the "FAR") and its supplements. BUNGET
-represents that the Software was developed entirely at
-private expense, that no part of the Software was first
-produced in the performance of a Government contract, and
-that no part of the Software is in the public domain. (1)
-If the Software is supplied for use by DoD, the Software is
-delivered subject to the terms of this license agreement
-and either (i) in accordance with DFARS 227.7202-1(a) and
-227.7202-3(a), or (ii) with restricted rights in accordance
-with DFARS 252.227-7013(c)(1)(ii) (OCT 1988), as
-applicable. (2) If the Software is supplied for use by a
-Federal agency other than DoD, the Software is restricted
-computer software delivered subject to the terms of this
-license agreement and (i) FAR 12.212(a); (ii) FAR 52.227-
-19; or (iii) FAR 52.227-14(ALT III), as applicable.
-
-RESTRICTED RIGHTS 
-
-Use, duplication, or disclosure by the U.S. Government is
-subject to restrictions set forth in this agreement and as
-provided in DFARS 227.7202-1(a) and 227.7202-3(a) (1995),
-DFARS 252.227-7013(c)(1)(ii) (OCT 1988), FAR 12.212(a)
-(1995), FAR 52.227-19, or FAR 52.227-14 (ALT III), as
-applicable. Manufacturer is BUNGET Communications Security
-Corp, Fredrikinkatu 42, FIN-00100, Helsinki, Finland.
-
-
-BUNGET does not charge license fees for bundling or
-distribution of only the respective UNIX versions of the
-Software solely with the following operating systems:
-Linux, NetBSD, FreeBSD and OpenBSD. In order to distribute
+In order to distribute
 the Software with the above-mentioned operating systems,
 You must enter into a separate agreement with BUNGET. Also,
 bundling or distribution with hardware products or
 commercial software products (other than the above-
 mentioned operating systems distributions) requires a
 distribution license, which includes license fees for such
-distribution. Please contact the Author.
+distribution. 
+
+###### Please contact the Author.
