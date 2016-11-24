@@ -288,20 +288,25 @@ my_proc event: onSubscribesNotify:3403=1
 ### Issues
 - If nothing happen tweak the timout [0-64] in main ctx->new_server(&procedure, dev, hostname, <timeout>);
 
-### Tested on 
+### Tested on
+
 ####   R-PI 3
   - Linux minibian 4.4.17-v7+ #901 SMP Fri Aug 12 17:57:27 BST 2016 armv7l GNU/Linux
   - gcc (Raspbian 4.9.2-10) 4.9.2
   - g++ (Raspbian 4.9.2-10) 4.9.2
+  
 #### Ubuntu 16.04
   - Linux X540LA (ACER) 4.4.0-47-generic #68-Ubuntu SMP Wed Oct 26 19:39:52 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
   - gcc (Ubuntu 4.8.5-4ubuntu2) 4.8.5
   - g++ (Ubuntu 4.8.5-4ubuntu2) 4.8.5
+  
 #### Linux Mint
   - Linux hp 3.19.0-32-generic #37~14.04.1-Ubuntu SMP Thu Oct 22 09:41:40 UTC 2015 x86_64 x86_64 x86_64 GNU/Linux
   - g++ (Ubuntu 4.8.4-2ubuntu1~14.04.3) 4.8.4
   - gcc (Ubuntu 4.8.4-2ubuntu1~14.04.3) 4.8.4
-   
+
+
+
 #### Dongle USB used
 ```
 [33544.074470] usb 4-1.2: new full-speed USB device number 5 using ehci-pci
