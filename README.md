@@ -210,8 +210,8 @@ cd bin
 ```
 
 #########################################################################
-### Raspberry PI Build
-
+### Raspberry PI Build (check compiler version )
+  - The C compiler identification is GNU 4.9.2
   - Board: RPI-2
   - Fresh distribution: Linux minibian 4.1.18-v7+ #846 SMP Thu Feb 25 14:22:53 GMT 2016 armv7l GNU/Linux
   - Login as root/raspberry
