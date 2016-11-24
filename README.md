@@ -319,6 +319,14 @@ my_proc event: onSubscribesNotify:3403=1
 [33544.172193] Bluetooth: hci1: BCM: patch brcm/BCM20702A0-0a5c-21e8.hcd not found
 ```
 
+#### Device Used
+  - Nexux Tablet Android 6.0,
+  - ACER T06, Android 6.0, using following apps
+    - BLE Scanner
+    - ArduiuiPush
+  - Failed with ACER   AI - 830
+  - Failed with Android 4.4.2
+  
 
 
 #######################################################################
