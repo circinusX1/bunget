@@ -203,10 +203,6 @@ H O W     TO   B U I L D
 
 #######################################################################
 ```javascript
-cd src/libbunget
-cmake .
-make
-cd ..
 cmake .
 make
 cd bin
@@ -234,13 +230,8 @@ service bluetooth stop   # not mandatory
 update-rc.d -f  bluetooth remove   # not mandatory
 
 
-git clone https://github.com/zirexix/bunget
-cd bunget/src/libbunget/
-mv bu_gatt.cc.o bu_gatt.o-old
-cp ./R-PI/bu_gatt.cc.o ./
-cmake .
-make
-cd ..
+git clone https://github.com/comarius/bunget
+cd bunget
 cmake .
 make
 cd bin
@@ -296,6 +287,6 @@ my_proc event: onSubscribesNotify:3403=1
 
 #######################################################################
 
-contact by eMail for any questions: zirexixATgmailDOTcom 
+contact by eMail for any questions: marrius9876@gmail 
 *** Free for non commercial products only ***
 
