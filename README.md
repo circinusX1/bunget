@@ -5,6 +5,17 @@
 ##### *beta-version_plus* 
 ####### (Bunget, read 'ge' as in George)
 
+#### Build lib bunget and demo application
+
+### Prerequisites 
+* Linux
+  * sudo apt-get install uuid-dev
+  * sudo apt-get install cmake
+  * sudo apt-get install build-essential
+  * sudo apt-get install libcrypto++-dev
+  
+
+
 ### Description:
 
 BUNGET is a C++ library for Linux which help to write GAP/GATT servers (Bluetooth 4.0). It provides abstract classes and methods to create GATT services, characteristics (READ/WRITE/NOTIFICATIONS). The library does not require the Bluez, but it requires some bluetooth utilities. The library was written from scratch. The idea of writing 'yet another BTLE implemetation' came after I spend days and days trying Bluez and Bleno. I could not get Blues working programatically and easy. Bleno is terible slow and tremendous resource eater, also brings entire java enciclopedia along with. 
@@ -275,13 +286,33 @@ my_proc event: onSubscribesNotify:3403=1
 
   
 ### Issues
-- if noting happen build debug veriosn: add to CmakeLists.txt: add_definitions( -DDEBUG )
-  - cmake && make on both folders
-- Tested on RPI 2 / B with broadcom BT dogle
-- Did not work on RPI-3 with the onboard BT (after firmware update, and detecting onboard hci over UART)
-- Worked on RPI3 with the onboard BT disabled from firmware of hciconfig hci0 down, and using the dongle
-  - Timing tweak for RPI3 was 9   
+- If nothing happen tweak the timout [0-64] in main ctx->new_server(&procedure, dev, hostname, <timeout>);
 
+### Tested on 
+####   R-PI 3
+  - Linux minibian 4.4.17-v7+ #901 SMP Fri Aug 12 17:57:27 BST 2016 armv7l GNU/Linux
+  - gcc (Raspbian 4.9.2-10) 4.9.2
+  - g++ (Raspbian 4.9.2-10) 4.9.2
+#### Ubuntu 16.04
+  - Linux X540LA (ACER) 4.4.0-47-generic #68-Ubuntu SMP Wed Oct 26 19:39:52 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+  - gcc (Ubuntu 4.8.5-4ubuntu2) 4.8.5
+  - g++ (Ubuntu 4.8.5-4ubuntu2) 4.8.5
+#### Linux Mint
+  - Linux hp 3.19.0-32-generic #37~14.04.1-Ubuntu SMP Thu Oct 22 09:41:40 UTC 2015 x86_64 x86_64 x86_64 GNU/Linux
+  - g++ (Ubuntu 4.8.4-2ubuntu1~14.04.3) 4.8.4
+  - gcc (Ubuntu 4.8.4-2ubuntu1~14.04.3) 4.8.4
+   
+#### Dongle USB used
+```
+[33544.074470] usb 4-1.2: new full-speed USB device number 5 using ehci-pci
+[33544.171100] usb 4-1.2: New USB device found, idVendor=0a5c, idProduct=21e8
+[33544.171108] usb 4-1.2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+[33544.171114] usb 4-1.2: Product: BCM20702A0
+[33544.171118] usb 4-1.2: Manufacturer: Broadcom Corp
+[33544.171123] usb 4-1.2: SerialNumber: 5CF3706B72D6
+[33544.172183] bluetooth hci1: Direct firmware load for brcm/BCM20702A0-0a5c-21e8.hcd failed with error -2
+[33544.172193] Bluetooth: hci1: BCM: patch brcm/BCM20702A0-0a5c-21e8.hcd not found
+```
 
 
 
@@ -289,4 +320,3 @@ my_proc event: onSubscribesNotify:3403=1
 
 contact by eMail for any questions: marrius9876@gmail 
 *** Free for non commercial products only ***
-
