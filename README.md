@@ -74,7 +74,7 @@ Check also: ArduUiPush demo: https://www.youtube.com/watch?v=Fw4yCe2ejNw
 
 ## Class Diagram
 
-![alt text](https://github.com/zyraxes-com/bunget/blob/master/docs/bungetl.png "bunget-lib")
+![alt text](https://github.com/comarius/bunget/blob/master/docs/bungetl.png "bunget-lib")
 
 
 ## Issues Tweaks 
