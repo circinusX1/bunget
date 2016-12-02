@@ -41,7 +41,7 @@ Anyway, I cloned my repo and tested Bunget. Works fine. The BT bluez, bluetooth,
   ```
   
   
-  ![bunget on Acer phone with C H I P](http://209.177.145.195/share/chip.png "bunget-lib")
+  ![bunget on Acer phone with C H I P](http://209.177.145.195/share/chip.jpg "bunget-lib")
   
   
   
