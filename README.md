@@ -294,7 +294,12 @@ my_proc event: onSubscribesNotify:3403=1
 
   
 ### Issues
-- If nothing happen tweak the timout [0-64] in main ctx->new_server(&procedure, dev, hostname, <timeout>);
+- stop bunget
+- disable bluetooth service
+- stop bluetooth service
+- kill any process which uses bluetooth (scripts, desktop daemons, etc.)
+- restart on the mobile the bluetooth service (off 5 seconds, then on / reboot recomanded on some chipsets)
+- Tweak the timout [0-64] in main ctx->new_server(&procedure, dev, hostname, <timeout>);
 
 ### Tested on
 
