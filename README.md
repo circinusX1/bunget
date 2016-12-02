@@ -29,6 +29,14 @@ So: here is a simple C++ library which uses just a HCI socket and GAP/GATT proto
 * Latest version is at: https://github.com/zirexix
 
 
+
+#### (iii) Before running bunget
+ * Disable / uninstall bluetooth service. 
+ * Disable kill any bt managers if you have a desktop environment.
+ * check if there are any processes keeping BT up. (ps ax | grep blu )
+ * Kill them all. Make sure they not restart.
+  
+
 ## Usage
 
 * Turn device running Linux system in to a GATT server. 
@@ -289,6 +297,12 @@ my_proc event: onSubscribesNotify:3403=1
 - If nothing happen tweak the timout [0-64] in main ctx->new_server(&procedure, dev, hostname, <timeout>);
 
 ### Tested on
+
+   - Make sure any processes that uses BT is killed, otherwise the LE disconects, or fails to grab services.
+
+####   C H I P
+   - On board BT4 and default installed system. See the C H I P readme page.
+    
 
 ####   R-PI 3
   - Linux minibian 4.4.17-v7+ #901 SMP Fri Aug 12 17:57:27 BST 2016 armv7l GNU/Linux
