@@ -1,9 +1,10 @@
 
-## Using BTLE On C. H. I. P. Board with BUNGET
+# BTLE On C.H.I.P as GATT Server using Bunget library 
+
 
 I got my CHIP Board fre hours ago. Amazing. 0.180-0.300A Amps, Has 2 wifi, 1 BT4.
-  - 0.18A in stand by (with the desktop, I dont have display adaptor but LightDM is running), with wlan0 and BT on. 
-  - 0.26A BT + wlan0 + wlan1 (as access point on HOSTAPD) (though hostapd does not starts as service but in shell does) 
+  - 0.18A idling there (with the desktop, I dont have display adaptor but LightDM is running), with wlan0 and BT on. 
+  - 0.26A BT + wlan0 + wlan1 (as HOST AP ) (though hostapd does not starts as service but in shell it does) 
   - 0.340A picks here and there during apt-get install and make 
 
 Anyway, I cloned my repo and tested Bunget. Works fine. The BT bluez, bluetooth, and  python daemons related to BT should be killed. I dont have a display, therefore I killed lighdm service as well. Here is my shell history, and th ephone showing the services. To kill BLUETOOH service is required on all devices. DO not RUN BUNGET when BLUETOOTH is running.
