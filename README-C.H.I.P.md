@@ -1,5 +1,5 @@
 
-# BTLE On C.H.I.P as GATT Server using Bunget library 
+# BTLE On C.H.I.P Board as GATT Server using Bunget library 
 
 
 I got my CHIP Board fre hours ago. Amazing. 0.180-0.300A Amps, Has 2 wifi, 1 BT4.
