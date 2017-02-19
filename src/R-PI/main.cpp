@@ -35,11 +35,12 @@
 #include <stdio.h>
 #include <time.h>
 #include <assert.h>
+#include <uuid.h>
+#include <libbunget.h>
 #include <stdio.h>
 #include <sys/select.h>
 #include <termios.h>
 #include <stropts.h>
-#include <libbunget.h>
 
 
 using namespace std;
@@ -50,6 +51,8 @@ bool __alive = true;
 /****************************************************************************************
 */
 int _kbhit() {
+
+
     static const int STDIN = 0;
     static bool initialized = false;
 
@@ -111,6 +114,8 @@ public:
 */
 int main(int n, char* v[])
 {
+
+
     if(n==1)
     {
         std::cout << "bunget hcidev# <b>    [ b for beacon mode demo] \n";
@@ -121,10 +126,11 @@ int main(int n, char* v[])
     BtCtx*      ctx = BtCtx::instance();
     my_proc     procedure;
 
+    std::cout << "bunget starting \n";
     int dev = ::atoi(v[1]);
     try{
-        IServer*    BS =  ctx->new_server(&procedure, dev, "advname", 9);
-        //BS->set_name("advname"); // this is the bt name.
+        IServer*    BS =  ctx->new_server(&procedure, dev, "pibunget");
+        BS->set_name("pibunget"); // this is the bt name.
 
         if(n==3 && v[2][0]=='b') //beacon mode
         {
@@ -155,10 +161,10 @@ int main(int n, char* v[])
     }
     catch(bunget::hexecption& ex)
     {
-
-        ERROR (ex.report());
+		std::cout << "exception\n";
+        std::cout << (ex.report());
     }
-
+	std::cout << "exiting \n";
     return 0;
 }
 
@@ -179,8 +185,10 @@ bool my_proc::onSpin(IServer* ps)
     static int inawhile=0;
 
     if(_kbhit()){
-        if(getchar()=='q')
-        return false;
+        if(getchar()=='q'){
+			std::cout << "user: exiting \n";
+			return false;
+		}
     }
 
     // notification

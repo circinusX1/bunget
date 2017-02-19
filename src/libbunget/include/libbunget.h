@@ -6,7 +6,7 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
     This program, or portions of it cannot be used in commercial
-    products without the written consent of the author: marrius9876@gmail.com.
+    products without the written consent of the author: zyraxes.comatgmaildotcom.
 
 */
 
@@ -31,6 +31,7 @@
                                                  // untill receives confirmation
 #define  PROPERTY_SIGNED_WRITE              0x40 //
 #define  PROPERTY_EXTENDED_PROPS            0x80 //
+
 
 #define  SECURITY_BROADCAST                 0x1
 #define  SECURITY_READ                      0x2

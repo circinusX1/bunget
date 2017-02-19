@@ -35,8 +35,8 @@ extern "C" {
 
 #define SCO_CONN_TIMEOUT	(HZ * 40)
 #define SCO_DISCONN_TIMEOUT	(HZ * 2)
-
 #define SCO_CONN_IDLE_TIMEOUT	(HZ * 60)
+
 /* SCO socket address */
 struct sockaddr_sco {
 	sa_family_t	sco_family;

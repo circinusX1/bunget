@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="libbunget" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="../lib/bungetdbg" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="obj/Debug/" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option host_application="/home/marius/CPP/bulex/bin/Debug/bunget" />
+				<Option run_host_application_in_terminal="0" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="../lib/bunget" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="obj/Release/" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-std=c++11" />
+			<Add option="-DNO_USE_UVLIB" />
+		</Compiler>
+		<Unit filename="CMakeLists.txt" />
+		<Unit filename="ascon.cpp" />
+		<Unit filename="ascon.h" />
+		<Unit filename="bt_incinpl.cpp" />
+		<Unit filename="bt_socket.cpp" />
+		<Unit filename="bt_socket.h" />
+		<Unit filename="bu_gap.cpp" />
+		<Unit filename="bu_gap.h" />
+		<Unit filename="bu_gatt.cpp" />
+		<Unit filename="bu_gatt.h" />
+		<Unit filename="bu_hci.cpp" />
+		<Unit filename="bu_hci.h" />
+		<Unit filename="bungetapp.h" />
+		<Unit filename="bungetconf.h" />
+		<Unit filename="bybuff.cpp" />
+		<Unit filename="bybuff.h" />
+		<Unit filename="cryptos.cpp" />
+		<Unit filename="cryptos.h" />
+		<Unit filename="dl_open.cpp" />
+		<Unit filename="dl_open.h" />
+		<Unit filename="gattdefs.cpp" />
+		<Unit filename="gattdefs.h" />
+		<Unit filename="hci_client.cpp" />
+		<Unit filename="hci_client.h" />
+		<Unit filename="hci_server.cpp" />
+		<Unit filename="hci_server.h" />
+		<Unit filename="hci_socket.cpp" />
+		<Unit filename="hci_socket.h" />
+		<Unit filename="include/bluetooth.h" />
+		<Unit filename="include/hci.h" />
+		<Unit filename="include/hci_lib.h" />
+		<Unit filename="include/l2cap.h" />
+		<Unit filename="include/libbunget.h" />
+		<Unit filename="include/rfcomm.h" />
+		<Unit filename="include/sco.h" />
+		<Unit filename="include/uuid.h" />
+		<Unit filename="l2cap_socket.cpp" />
+		<Unit filename="l2cap_socket.h" />
+		<Unit filename="lebiendians.h" />
+		<Unit filename="libbunget.h" />
+		<Unit filename="libbungetpriv.cpp" />
+		<Unit filename="libbungetpriv.h" />
+		<Unit filename="os.h" />
+		<Unit filename="rfcomm_socket.cpp" />
+		<Unit filename="rfcomm_socket.h" />
+		<Unit filename="sco_socket.cpp" />
+		<Unit filename="sco_socket.h" />
+		<Unit filename="secmanp.cpp" />
+		<Unit filename="secmanp.h" />
+		<Unit filename="uguid.cpp" />
+		<Unit filename="uguid.h" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

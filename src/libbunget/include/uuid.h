@@ -1,5 +1,4 @@
 /*
-
  *
  *  BlueZ - Bluetooth protocol stack for Linux
  *

@@ -27,7 +27,6 @@
 #ifndef __L2CAP_H
 #define __L2CAP_H
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -35,6 +35,7 @@ extern "C" {
 #define RFCOMM_DEFAULT_MTU	127
 
 #define RFCOMM_PSM 3
+
 /* RFCOMM socket address */
 struct sockaddr_rc {
 	sa_family_t	rc_family;
