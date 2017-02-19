@@ -10,20 +10,25 @@
 
 */
 
+
 #include "bu_hci.h"
 #include "ascon.h"
 #include "libbungetpriv.h"
 using namespace bunget;
 
+
 /****************************************************************************************
 */
-bu_asc::bu_asc(bu_hci* hci, uint16_t handle,
-                            const bdaddr_t& l,
-                            int ltyp,
-                            const bdaddr_t& r,
-                            int rtyp):_handle(handle),_hci(hci)
+
+bu_asc::bu_asc( ICryptoLib* plib,
+                bu_hci* hci,
+                uint16_t handle,
+                const bdaddr_t& l,
+                int ltyp,
+                const bdaddr_t& r,
+                int rtyp):_handle(handle),_hci(hci)
 {
-    _secman = new secmanp(this, hci, l, ltyp, r, rtyp);
+    _secman = new secmanp(plib, this, hci, l, ltyp, r, rtyp);
 }
 
 /****************************************************************************************

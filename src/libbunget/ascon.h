@@ -13,14 +13,11 @@
 #ifndef ASYNCCONNLESS_H
 #define ASYNCCONNLESS_H
 
-
 #include <stdint.h>
 #include "include/bluetooth.h"
 #include "secmanp.h"
 #include "bu_hci.h"
 #include "bybuff.h"
-
-using namespace bunget;
 
 class bu_asc
 {
