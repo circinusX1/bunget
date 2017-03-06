@@ -348,6 +348,7 @@ float my_proc::_get_temp()
 */
 const char* my_proc::_get_temp_s()
 {
+   float ftamp=0.0;
 #ifdef ARM_CC
     ::system("/opt/vc/bin/vcgencmd measure_temp > /tmp/bunget");
     std::ifstream ifs("/tmp/bunget");
