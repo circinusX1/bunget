@@ -6,7 +6,7 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
     This program, or portions of it cannot be used in commercial
-    products without the written consent of the author: zyraxes.comatgmaildotcom.
+    products without the written consent of the author: marrius9876@gmail.com
 
 */
 
@@ -16,10 +16,8 @@
 */
 void sco_socket::create()
 {
-
     _sock = ::socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_SCO);
     if(_sock<=0) _THROW(0);
-
 }
 
 /****************************************************************************************

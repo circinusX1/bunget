@@ -6,7 +6,7 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
     This program, or portions of it cannot be used in commercial
-    products without the written consent of the author: zyraxes.comatgmaildotcom.
+    products without the written consent of the author: marrius9876@gmail.com
 
 */
 
@@ -237,7 +237,7 @@ protected:
     }
     template <typename T>void _write_sock(const T& t, size_t sz=sizeof(T))
     {
-        int ret = _socket->write(t, sz);
+        size_t ret = _socket->write(t, sz);
         if(ret != sz)
         {
             _THROW("socket send error");

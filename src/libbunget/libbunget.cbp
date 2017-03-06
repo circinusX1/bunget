@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="../lib/bungetdbg" prefix_auto="1" extension_auto="1" />
+				<Option output="../lib/bunget" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="" />
 				<Option object_output="obj/Debug/" />
 				<Option type="2" />
@@ -38,6 +38,7 @@
 		</Build>
 		<Compiler>
 			<Add option="-std=c++11" />
+			<Add option="-Wno-unused-variable" />
 			<Add option="-DNO_USE_UVLIB" />
 		</Compiler>
 		<Unit filename="CMakeLists.txt" />
@@ -58,13 +59,10 @@
 		<Unit filename="bybuff.h" />
 		<Unit filename="cryptos.cpp" />
 		<Unit filename="cryptos.h" />
-		<Unit filename="dl_open.cpp" />
 		<Unit filename="dl_open.h" />
 		<Unit filename="gattdefs.cpp" />
 		<Unit filename="gattdefs.h" />
-		<Unit filename="hci_client.cpp" />
 		<Unit filename="hci_client.h" />
-		<Unit filename="hci_server.cpp" />
 		<Unit filename="hci_server.h" />
 		<Unit filename="hci_socket.cpp" />
 		<Unit filename="hci_socket.h" />

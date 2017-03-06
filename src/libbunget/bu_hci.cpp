@@ -6,7 +6,7 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
     This program, or portions of it cannot be used in commercial
-    products without the written consent of the author: zyraxes.comatgmaildotcom.
+    products without the written consent of the author: marrius9876@gmail.com
 
 */
 #include <assert.h>
