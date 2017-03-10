@@ -40,6 +40,7 @@
 			<Add option="-std=c++11" />
 			<Add option="-Wno-unused-variable" />
 			<Add option="-DNO_USE_UVLIB" />
+			<Add option="-DDEBUG" />
 		</Compiler>
 		<Unit filename="CMakeLists.txt" />
 		<Unit filename="ascon.cpp" />

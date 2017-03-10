@@ -596,14 +596,21 @@ int bu_hci::on_sock_data(uint8_t code, const sdata& buffer) //received
             }
             else
             {
-                assert(_cache.find(handle) == _cache.end());
+                /// assert(_cache.find(handle) == _cache.end());
                 //accumulate data bt handler
-                no_acl_start_len_dynamic* pd = new(no_acl_start_len_dynamic);
-                pd->cit = (cid);
-                pd->len = (chunklen);
-                pd->expectedlen = (expectedlen);
-                pd->byarr.insert(pd->byarr.end(), sd.data, sd.data + sd.len);
-                _cache[handle] = pd;
+                if(_cache.find(handle) == _cache.end())
+                {
+                    no_acl_start_len_dynamic* pd = new(no_acl_start_len_dynamic);
+                    pd->cit = (cid);
+                    pd->len = (chunklen);
+                    pd->expectedlen = (expectedlen);
+                    pd->byarr.insert(pd->byarr.end(), sd.data, sd.data + sd.len);
+                    _cache[handle] = pd;
+                }
+                else
+                {
+                    TRACE("Error: We should not be getting this!. \n");
+                }
             }
         }
         else if (ACL_CONT == flags)
@@ -663,16 +670,19 @@ void bu_hci::_oncmd_complette(const no_evt_cmd_complete* nevcc)
     switch(nevcc->cmd)
     {
         case RESET_CMD:
+             TRACE("RESET_CMD");
             _reconfigure();
             break;
         case READ_LE_HOST_SUPPORTED_CMD:
             {
+                TRACE("READ_LE_HOST_SUPPORTED_CMD");
                 uint8_t le = nevcc->data[0];
                 uint8_t simul = nevcc->data[1];
             }
             break;
         case READ_LOCAL_VERSION_CMD:
             {
+                TRACE("READ_LOCAL_VERSION_CMD");
                 uint8_t  hciVer = nevcc->data[0];
                 if (hciVer < 0x06)
                 {
@@ -693,6 +703,7 @@ void bu_hci::_oncmd_complette(const no_evt_cmd_complete* nevcc)
             break;
         case READ_BD_ADDR_CMD:
             {
+                TRACE("READ_BD_ADDR_CMD");
                 memcpy(&_address, nevcc->data, sizeof(bdaddr_t));
                 _addrtype = ADDR_PUBLIC;
                 _pev->on_mac_change(_address);
@@ -701,41 +712,49 @@ void bu_hci::_oncmd_complette(const no_evt_cmd_complete* nevcc)
             }
             break;
         case LE_SET_ADVERTISING_PARAMETERS_CMD:
+            TRACE("LE_SET_ADVERTISING_PARAMETERS_CMD");
             _onhci_state_chnaged(STATE_POWEREDON);
             _pev->on_adv_status(_state);
             break;
         case LE_SET_ADVERTISING_DATA_CMD:
+            TRACE("LE_SET_ADVERTISING_DATA_CMD");
             _pev->on_adv_data_status(nevcc->status);
             break;
         case LE_SET_SCAN_RESPONSE_DATA_CMD:
+            TRACE("LE_SET_SCAN_RESPONSE_DATA_CMD");
             _pev->on_scan_resp_datat_status(nevcc->status);
             break;
         case LE_SET_ADVERTISE_ENABLE_CMD:
+            TRACE("LE_SET_ADVERTISE_ENABLE_CMD");
             _pev->on_adv_enable(nevcc->status);
             break;
         case READ_RSSI_CMD:
             {
+                TRACE("READ_RSSI_CMD");
                 handle =  oa2t<uint16_t>(nevcc->data,0); //result.readUInt16LE(0);
                 uint8_t rssi = nevcc->data[2];
                 _pev->on_rssi(handle, rssi);
             }
             break;
         case LE_LTK_NEG_REPLY_CMD:
+            TRACE("LE_LTK_NEG_REPLY_CMD");
             handle =  oa2t<uint16_t>(nevcc->data,0);
             _pev->le_ltk_neg_reply(handle);
             break;
         case CMD_OPCODE_PACK(OCF_HOLD_MODE,OGF_LINK_POLICY):
             {
+                TRACE("CMD_OPCODE_PACK(OCF_HOLD_MODE,OGF_LINK_POLICY)");
                 hold_mode_cp* hmcp = (hold_mode_cp*)nevcc->data;
             }
             break;
         case CMD_OPCODE_PACK(OCF_INQUIRY,OGF_LINK_CTL):
             {
-
+                TRACE("CMD_OPCODE_PACK(OCF_INQUIRY,OGF_LINK_CTL)");
             }
             break;
         default:
             {
+                TRACE("default");
                 uint16_t ogf = CMD_OPCODE_OGF(nevcc->cmd);
                 uint16_t ocf = CMD_OPCODE_OCF(nevcc->cmd);
                 TRACE("UNK command: OCF=" << std::hex <<

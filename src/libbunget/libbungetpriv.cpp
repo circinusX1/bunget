@@ -351,6 +351,7 @@ void SrvDevice::on_mac_change(const bdaddr_t& addr)
 */
 void SrvDevice::on_adv_status(HCI_STATE status)
 {
+    TRACE("on_adv_status = " << int(status));
     _hcistatus = status; //STATE_POWEREDOFF
 }
 
@@ -358,6 +359,7 @@ void SrvDevice::on_adv_status(HCI_STATE status)
 */
 void SrvDevice::on_adv_data_status(uint8_t status)
 {
+    TRACE("on_adv_data_status = " << int(status));
     _advstatus = status;
 }
 
@@ -365,13 +367,15 @@ void SrvDevice::on_adv_data_status(uint8_t status)
 */
 void SrvDevice::on_scan_resp_datat_status(uint8_t status)
 {
-    _scanrespdatastatus =status;
+    TRACE("on_scan_resp_datat_status = " << int(status));
+    _scanrespdatastatus = int(status);
 }
 
 /****************************************************************************************
 */
 void SrvDevice::on_adv_enable(uint8_t status)
 {
+    TRACE("on_adv_enable = " << int(status));
     _advstatus = status;
 }
 

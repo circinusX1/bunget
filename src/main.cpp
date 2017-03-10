@@ -123,7 +123,7 @@ int main(int n, char* v[])
 
     int dev = ::atoi(v[1]);
     try{
-        IServer*    BS =  ctx->new_server(&procedure, dev, "advname", 9);
+        IServer*    BS =  ctx->new_server(&procedure, dev, "linuxhp", 9);
         //BS->set_name("advname"); // this is the bt name.
 
         if(n==3 && v[2][0]=='b') //beacon mode
