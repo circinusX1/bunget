@@ -29,7 +29,7 @@ Be prepared , BTLE is a messy protocol, (looks was it designed by lawyers, not b
 * Requires: hciconfig tool from blues package in /usr/bin
 * (iii).    Bunget lib will stop the bluetooth service.
 * (iiii) Read all documents.
-* Latest version is at: https://github.com/zirexix
+
 
 
 
