@@ -1,5 +1,5 @@
-# BTLE For Linux,  Raspberry PI
-## Raspberry PI BTLE C++ Library
+# BTLE For Linux (x86 and ARM)
+## Tested on x86, R-PI, Nano-Pi, and CHIP
 ##
 ###      BUNGET
 ##### Version 1.0.0, March 9 2016
