@@ -2,7 +2,7 @@
 ## Raspberry PI BTLE C++ Library
 ##
 ###      BUNGET
-##### *beta-version_plus* 
+##### Version 1.0.0, March 9 2016
 ####### (Bunget, read 'ge' as in George)
 
 #### Build lib bunget and demo application
