@@ -346,6 +346,8 @@ my_proc event: onSubscribesNotify:3403=1
   - ACER T06, Android 6.0, using following apps
     - BLE Scanner
     - ArduiuiPush
+    - BluetoothLegatt V0.1.7 (this auto disconnects after 30..50 seocnds or so)
+    
   - Failed with ACER   AI - 830
   - Failed with Android 4.4.2
   
