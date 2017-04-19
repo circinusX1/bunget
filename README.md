@@ -20,7 +20,8 @@
 
 BUNGET is a C++ library for Linux which help to write GAP/GATT servers (Bluetooth 4.0). It provides abstract classes and methods to create GATT services, characteristics (READ/WRITE/NOTIFICATIONS). The library does not require the Bluez, but it requires some bluetooth utilities. The library was written from scratch. The idea of writing 'yet another BTLE implemetation' came after I spend days and days trying Bluez and Bleno. I could not get Blues working programatically and easy. Bleno is terible slow and tremendous resource eater, also brings entire java enciclopedia along with. 
 Here is a simple C++ library which I hope would help to write GATT services. 
-Be prepared , BTLE is a messy protocol and mobile implementations tend to be outdated and shitty.  I would recomend to test your environment using arduiuipush app from the store. The app is not a BTLE but works fine, because has latest libraies SDK chnages google did for BTLE. The you can move and test other BTLE/GATT scanners, which I found not pretty cooperative. 
+
+Be prepared , BTLE is a messy protocol, (looks was it designed by lawyers, not by engineeres) and mobile implementations tend to be outdated and shitty.  I would recomend to test your environment using arduiuipush app from the store. The app is not a BTLE but works fine. I would display the data from the LE. Then you can move and test other BTLE/GATT scanners to test bunget. If you have problems with Android BTLE utelry mess, I can share the BTLE base class I used in arduiuipush. I spend many hours makeing it stable and reliable. 
 
 
 * Server only: GATT services characteristics, descriptors or beacons.
