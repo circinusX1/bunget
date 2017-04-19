@@ -120,8 +120,9 @@ int main(int n, char* v[])
 
     BtCtx*      ctx = BtCtx::instance();
     my_proc     procedure;
-
     int dev = ::atoi(v[1]);
+
+    std::cout << "Version 1.0.0 March 9 2017 \n";
     try{
         IServer*    BS =  ctx->new_server(&procedure, dev, "linuxhp", 9);
         //BS->set_name("advname"); // this is the bt name.
