@@ -61,8 +61,8 @@ BTLE is a messy protocol, Is designed by lawyers, not by engineeres) and Android
 Bluez, Bleno, StCube/BlueNrg, Bluetooth 4.0 Specs.
 
 
-##License:
-Free, for non commercial products, otherwise you need a written personalised license from the Author.
+## License:
+Free, for non commercial products. Personalised license from the Author for commercial products.
 
 
 ### SDK:
@@ -176,7 +176,7 @@ int main(int n, char* v[])
     //
     procedure.LedChr = ps->add_charact(UID_GPIO,PROPERTY_WRITE|PROPERTY_INDICATE|PROPERTY_NOTIFY,
                              0,
-                             FORMAT_RAW, 1); // 1 / 0  // many per service
+                             FORMAT_RAW, 1); // 1 / 0  // mhttps://play.google.com/store/apps/details?id=com.ermote.ArduUiPush&hl=enany per service
 
     procedure.TimeChr = ps->add_charact(UID_TIME, PROPERTY_READ|PROPERTY_NOTIFY,
                              0,
@@ -359,3 +359,10 @@ my_proc event: onSubscribesNotify:3403=1
 Questions, Bugs, Commercial usage: Contact by eMail for any questions: marrius9876[AT]gmail[DOT]com
 
 *P.S. Read this readme before asking questions with isssues. I dont wat to repeat what is already said here*
+
+----
+
+#######################################################################
+#### License:
+Free, for non commercial products. Personalised license from the Author for commercial products.
+
