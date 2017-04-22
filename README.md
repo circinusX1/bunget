@@ -21,7 +21,8 @@
 BUNGET is a C++ library for Linux which help to write GAP/GATT servers (Bluetooth 4.0). It provides abstract classes and methods to create GATT services, characteristics (READ/WRITE/NOTIFICATIONS). The library does not require the Bluez, but it requires some bluetooth utilities. The library was written from scratch. The idea of writing 'yet another BTLE implemetation' came after I spend days and days trying Bluez and Bleno. I could not get Blues working programatically and easy. Bleno is terible slow and tremendous resource eater, also brings entire java enciclopedia along with. 
 Here is a simple C++ library which I hope would help to write GATT services. 
 
-Be prepared , BTLE is a messy protocol, (looks was it designed by lawyers, not by engineeres) and mobile implementations tend to be outdated and shitty.  I would recomend to test your environment using arduiuipush app from the store. The app is not a BTLE but works fine. I would display the data from the LE. Then you can move and test other BTLE/GATT scanners to test bunget. If you have problems with Android BTLE utelry mess, I can share the BTLE base class I used in arduiuipush. I spend many hours makeing it stable and reliable. 
+Be advised! 
+BTLE is a messy protocol, Is designed by lawyers, not by engineeres) and Android LE mobile implementations (scanners/detecters) tend to be outdated and instable. I would recomend to test your environment using [arduiuipush](https://play.google.com/store/apps/details?id=com.ermote.ArduUiPush&hl=en) app from the store on Android and on Aple using PunchTru. If you are planning to write your own LE implementaiotnon Android, I can help with the arduiuipush LE base class which is preety stable and performs good.
 
 
 * Server only: GATT services characteristics, descriptors or beacons.
@@ -355,5 +356,6 @@ my_proc event: onSubscribesNotify:3403=1
 
 #######################################################################
 
-Questions, Bugs, Commercial usage: Contact by eMail for any questions: marrius9876@ g m a i   l . c  o  m
+Questions, Bugs, Commercial usage: Contact by eMail for any questions: marrius9876[AT]gmail[DOT]com
 
+*P.S. Read this readme before asking questions with isssues. I dont wat to repeat what is already said here*
