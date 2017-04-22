@@ -44,7 +44,7 @@ BTLE is a messy protocol, Is designed by lawyers, not by engineeres) and Android
 ## Usage
 
 * Turn device running Linux system in to a GATT server. 
-   * Soon all specific dev platforms for embedded custom chips will be replaced by Linux, pretty soon...
+   * *Soon all specific dev platforms for embedded custom chips will be replaced by Linux, pretty soon/Microsoft lost this battle*
 * Debug HCI clients
 
 ## Block Diagram:
