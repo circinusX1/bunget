@@ -13,6 +13,8 @@
 #ifndef _LIB_bunget_H_
 #define _LIB_bunget_H_
 
+
+
 #include <stdio.h>
 #include <stdint.h>
 #include <string>
@@ -21,7 +23,11 @@
 #include "uuid.h"
 #include "bluetooth.h"
 
+
+
+
 /// these are the mumbo jumbo protocol shitty properties
+#define  VERSION_LIB_BUNGET                 100
 #define  PROPERTY_BROADCAST                 0x1 //
 #define  PROPERTY_READ                      0x2 //
 #define  PROPERTY_WRITE_NO_RESPONSE         0x4 //

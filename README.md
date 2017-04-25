@@ -1,8 +1,8 @@
-# BTLE For Linux,  Raspberry PI
-## Raspberry PI BTLE C++ Library
+# BTLE For Linux (x86 and ARM)
+## Tested on x86, R-PI, Nano-Pi, and CHIP
 ##
 ###      BUNGET
-##### *beta-version_plus* 
+##### Version 1.0.0, March 9 2016
 ####### (Bunget, read 'ge' as in George)
 
 #### Build lib bunget and demo application
@@ -19,14 +19,18 @@
 ### Description:
 
 BUNGET is a C++ library for Linux which help to write GAP/GATT servers (Bluetooth 4.0). It provides abstract classes and methods to create GATT services, characteristics (READ/WRITE/NOTIFICATIONS). The library does not require the Bluez, but it requires some bluetooth utilities. The library was written from scratch. The idea of writing 'yet another BTLE implemetation' came after I spend days and days trying Bluez and Bleno. I could not get Blues working programatically and easy. Bleno is terible slow and tremendous resource eater, also brings entire java enciclopedia along with. 
-So: here is a simple C++ library which uses just a HCI socket and GAP/GATT protocol helping to write GATT services. 
+Here is a simple C++ library which I hope would help to write GATT services. 
+
+Be advised! 
+BTLE is a messy protocol, Is designed by lawyers, not by engineeres) and Android LE mobile implementations (scanners/detecters) tend to be outdated and instable. I would recomend to test your environment using [arduiuipush](https://play.google.com/store/apps/details?id=com.ermote.ArduUiPush&hl=en) app from the store on Android and on Aple using PunchTru. If you are planning to write your own LE implementation on Android, I can help with the arduiuipush LE base class which is stable.
+
 
 * Server only: GATT services characteristics, descriptors or beacons.
 * Characteristics: R W I N + Descriptors. 
 * Requires: hciconfig tool from blues package in /usr/bin
 * (iii).    Bunget lib will stop the bluetooth service.
 * (iiii) Read all documents.
-* Latest version is at: https://github.com/zirexix
+
 
 
 
@@ -40,7 +44,7 @@ So: here is a simple C++ library which uses just a HCI socket and GAP/GATT proto
 ## Usage
 
 * Turn device running Linux system in to a GATT server. 
-   * Soon all specific dev platforms for embedded custom chips will be replaced by Linux, pretty soon...
+   * *Soon all specific dev platforms for embedded custom chips will be replaced by Linux, pretty soon/Microsoft lost this battle*
 * Debug HCI clients
 
 ## Block Diagram:
@@ -57,8 +61,8 @@ So: here is a simple C++ library which uses just a HCI socket and GAP/GATT proto
 Bluez, Bleno, StCube/BlueNrg, Bluetooth 4.0 Specs.
 
 
-##License:
-Free, for non commercial products, otherwise you need a written personalised license from the Author.
+## License:
+Free, for non commercial products. Personalised license from the Author for commercial products.
 
 
 ### SDK:
@@ -172,7 +176,7 @@ int main(int n, char* v[])
     //
     procedure.LedChr = ps->add_charact(UID_GPIO,PROPERTY_WRITE|PROPERTY_INDICATE|PROPERTY_NOTIFY,
                              0,
-                             FORMAT_RAW, 1); // 1 / 0  // many per service
+                             FORMAT_RAW, 1); // 1 / 0  // mhttps://play.google.com/store/apps/details?id=com.ermote.ArduUiPush&hl=enany per service
 
     procedure.TimeChr = ps->add_charact(UID_TIME, PROPERTY_READ|PROPERTY_NOTIFY,
                              0,
@@ -343,6 +347,8 @@ my_proc event: onSubscribesNotify:3403=1
   - ACER T06, Android 6.0, using following apps
     - BLE Scanner
     - ArduiuiPush
+    - BluetoothLegatt V0.1.7 (this auto disconnects after 30..50 seocnds or so)
+    
   - Failed with ACER   AI - 830
   - Failed with Android 4.4.2
   
@@ -350,5 +356,13 @@ my_proc event: onSubscribesNotify:3403=1
 
 #######################################################################
 
-Questions, Bugs, Commercial usage: Contact by eMail for any questions: marrius9876@ g m a i   l . c  o  m
+Questions, Bugs, Commercial usage: Contact by eMail for any questions: marrius9876[AT]gmail[DOT]com
+
+*P.S. Read this readme before asking questions with isssues. I dont wat to repeat what is already said here*
+
+----
+
+#######################################################################
+#### License:
+Free, for non commercial products. Personalised license from the Author for commercial products.
 
