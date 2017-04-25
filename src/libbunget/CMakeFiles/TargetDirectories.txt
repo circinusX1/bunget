@@ -1,3 +1,0 @@
-/home/marius/APPS/CPP/bunget/src/libbunget/CMakeFiles/edit_cache.dir
-/home/marius/APPS/CPP/bunget/src/libbunget/CMakeFiles/rebuild_cache.dir
-/home/marius/APPS/CPP/bunget/src/libbunget/CMakeFiles/bunget.dir
