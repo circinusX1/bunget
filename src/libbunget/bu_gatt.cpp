@@ -298,7 +298,7 @@ int bu_gatt::_type_q(const sdata& data, bybuff& ret)
             if(e->_hndl<hs)continue;
             if(e->_type==H_CHR )
             {
-                TRACE("adding characteristics: " << e->_hndl);
+                TRACE("adding characteristics1: " << e->_hndl);
                 chrs.push_back(e);
             }
         }
@@ -320,7 +320,10 @@ int bu_gatt::_type_q(const sdata& data, bybuff& ret)
             ret << uint16_t(pc->_hvalue);
 
             if(lengthPerCharacteristic==7)
+            {
+
                 ret << uint16_t(pc->_cuid.as16());
+            }
             else
                 ret << pc->_cuid;
             if(--elems==0)

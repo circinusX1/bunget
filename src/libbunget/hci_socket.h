@@ -20,7 +20,12 @@ class l2cap_socket;
 class hci_socket_ble : public bt_socket
 {
 public:
-     hci_socket_ble(hci_data_eater* hci):bt_socket(hci),_devId(0),_adaptivespeed(LOOP_SLEEP_IDLE),_loops(0){}
+     hci_socket_ble(hci_data_eater* hci):bt_socket(hci),_devId(0),_adaptivespeed(LOOP_SLEEP_IDLE),
+                        _loops(0),
+                        _addressType(0)
+     {
+        ::memset((void*)_address,0,sizeof(_address));
+     }
      ~hci_socket_ble();
     void create();
     void create_bind(int dev_id);
@@ -38,17 +43,21 @@ public:
     static void uv_this_cb_close(uv_poll_t* handle);
 #endif //
 private:
+    void _tweakHciKernel(int length, uint8_t* data);
     int _resolve_devid(int* pDevId, bool isUp);
     void _notify_read();
 private:
     int         _devId;
-    std::map<uint16_t,l2cap_socket*> _l2sockets;
+    //std::map<uint16_t,l2cap_socket*> _l2sockets;
+    std::map<uint16_t,int> _l2sockets;
 #ifdef USE_UVLIB
     uv_poll_t   _pollHandle;
 #endif //
     int         _checkfreq;
     int         _adaptivespeed;
     int         _loops;
+    uint8_t     _address[8];
+    int32_t     _addressType;
 };
 
 #endif // HCI_SOCKET_H

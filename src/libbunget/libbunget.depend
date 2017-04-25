@@ -1,0 +1,246 @@
+# depslib dependency file v1.0
+1488844241 source:/home/marius/APPS/CPP/bunget/src/libbunget/ascon.cpp
+	"bu_hci.h"
+	"ascon.h"
+	"libbungetpriv.h"
+
+1488844241 /home/marius/APPS/CPP/bunget/src/libbunget/bu_hci.h
+	<iostream>
+	<vector>
+	"include/hci.h"
+	"hci_socket.h"
+	"bybuff.h"
+
+1488843429 /home/marius/APPS/CPP/bunget/src/libbunget/include/hci.h
+	<stdint.h>
+	"bluetooth.h"
+	<sys/socket.h>
+
+1488843429 /home/marius/APPS/CPP/bunget/src/libbunget/include/bluetooth.h
+	<stdio.h>
+	<stdint.h>
+	<string.h>
+	<endian.h>
+	<byteswap.h>
+	<netinet/in.h>
+
+1493079819 /home/marius/APPS/CPP/bunget/src/libbunget/hci_socket.h
+	"bt_socket.h"
+
+1488844241 /home/marius/APPS/CPP/bunget/src/libbunget/bt_socket.h
+	<stdio.h>
+	<stdlib.h>
+	<inttypes.h>
+	<errno.h>
+	<sys/ioctl.h>
+	<sys/socket.h>
+	<sys/types.h>
+	<unistd.h>
+	"include/bluetooth.h"
+	"include/hci.h"
+	"include/hci_lib.h"
+	"include/rfcomm.h"
+	"include/l2cap.h"
+	"include/sco.h"
+	"include/libbunget.h"
+	<uv.h>
+	<string>
+	<map>
+
+1488843429 /home/marius/APPS/CPP/bunget/src/libbunget/include/hci_lib.h
+
+1488843429 /home/marius/APPS/CPP/bunget/src/libbunget/include/rfcomm.h
+	<sys/socket.h>
+
+1488843429 /home/marius/APPS/CPP/bunget/src/libbunget/include/l2cap.h
+	<sys/socket.h>
+
+1488843429 /home/marius/APPS/CPP/bunget/src/libbunget/include/sco.h
+
+1488844241 /home/marius/APPS/CPP/bunget/src/libbunget/include/libbunget.h
+	<stdio.h>
+	<stdint.h>
+	<string>
+	<vector>
+	<cerrno>
+	"uuid.h"
+	"bluetooth.h"
+
+1488843429 /home/marius/APPS/CPP/bunget/src/libbunget/include/uuid.h
+	<iostream>
+	"bluetooth.h"
+	<stdint.h>
+
+1488844241 /home/marius/APPS/CPP/bunget/src/libbunget/bybuff.h
+	<stdint.h>
+	<vector>
+	<iostream>
+	<bitset>
+	<sstream>
+	<algorithm>
+	"uguid.h"
+	"hci_socket.h"
+
+1488844241 /home/marius/APPS/CPP/bunget/src/libbunget/uguid.h
+	<iostream>
+	<string.h>
+	"include/uuid.h"
+	"include/bluetooth.h"
+
+1488844241 /home/marius/APPS/CPP/bunget/src/libbunget/ascon.h
+	<stdint.h>
+	"include/bluetooth.h"
+	"secmanp.h"
+	"bu_hci.h"
+	"bybuff.h"
+
+1488844241 /home/marius/APPS/CPP/bunget/src/libbunget/secmanp.h
+	"hci_socket.h"
+	"bybuff.h"
+	"cryptos.h"
+	"bu_hci.h"
+
+1488844241 /home/marius/APPS/CPP/bunget/src/libbunget/cryptos.h
+	"bybuff.h"
+
+1488844241 /home/marius/APPS/CPP/bunget/src/libbunget/libbungetpriv.h
+	<string>
+	<vector>
+	"gattdefs.h"
+	"bu_hci.h"
+	"include/libbunget.h"
+
+1488844241 /home/marius/APPS/CPP/bunget/src/libbunget/gattdefs.h
+	<stdint.h>
+	<iostream>
+	<string.h>
+	<string>
+	<vector>
+	"include/libbunget.h"
+	"uguid.h"
+	"bybuff.h"
+
+1488843427 source:/home/marius/APPS/CPP/bunget/src/libbunget/bt_incinpl.cpp
+	<stdio.h>
+	<errno.h>
+	<ctype.h>
+	<stdarg.h>
+	<stdlib.h>
+	<string.h>
+	<sys/socket.h>
+	"include/bluetooth.h"
+	"include/hci.h"
+
+1488844241 source:/home/marius/APPS/CPP/bunget/src/libbunget/bt_socket.cpp
+	"uguid.h"
+	"hci_socket.h"
+	"bu_hci.h"
+	"libbungetpriv.h"
+
+1488844241 source:/home/marius/APPS/CPP/bunget/src/libbunget/bu_gap.cpp
+	<dlfcn.h>
+	<vector>
+	"bu_gap.h"
+	"uguid.h"
+	"bybuff.h"
+	"gattdefs.h"
+	"include/bluetooth.h"
+
+1488844241 /home/marius/APPS/CPP/bunget/src/libbunget/bu_gap.h
+	"include/uuid.h"
+	<vector>
+	"hci_socket.h"
+	"bu_hci.h"
+	"include/libbunget.h"
+
+1492999467 source:/home/marius/APPS/CPP/bunget/src/libbunget/bu_gatt.cpp
+	<iostream>
+	<assert.h>
+	"gattdefs.h"
+	"bu_gatt.h"
+	"ascon.h"
+	"libbungetpriv.h"
+
+1488844241 /home/marius/APPS/CPP/bunget/src/libbunget/bu_gatt.h
+	<vector>
+	<map>
+	"include/uuid.h"
+	<vector>
+	"bybuff.h"
+	"hci_socket.h"
+	"bu_hci.h"
+	"gattdefs.h"
+
+1488844241 source:/home/marius/APPS/CPP/bunget/src/libbunget/bybuff.cpp
+
+1488844241 source:/home/marius/APPS/CPP/bunget/src/libbunget/cryptos.cpp
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+	"cryptos.h"
+	<crypto++/osrng.h>
+	<crypto++/modes.h>
+	<crypto++/aes.h>
+	<crypto++/filters.h>
+
+1488844241 source:/home/marius/APPS/CPP/bunget/src/libbunget/gattdefs.cpp
+	<vector>
+	"gattdefs.h"
+	"libbungetpriv.h"
+
+1488844241 source:/home/marius/APPS/CPP/bunget/src/libbunget/l2cap_socket.cpp
+	"l2cap_socket.h"
+
+1488844241 /home/marius/APPS/CPP/bunget/src/libbunget/l2cap_socket.h
+	"bt_socket.h"
+
+1488844241 source:/home/marius/APPS/CPP/bunget/src/libbunget/rfcomm_socket.cpp
+	"rfcomm_socket.h"
+
+1488844241 /home/marius/APPS/CPP/bunget/src/libbunget/rfcomm_socket.h
+	"bt_socket.h"
+
+1488844241 source:/home/marius/APPS/CPP/bunget/src/libbunget/sco_socket.cpp
+	"sco_socket.h"
+
+1488844241 /home/marius/APPS/CPP/bunget/src/libbunget/sco_socket.h
+	"bt_socket.h"
+
+1488843427 source:/home/marius/APPS/CPP/bunget/src/libbunget/secmanp.cpp
+	<iostream>
+	<iomanip>
+	"secmanp.h"
+	"bu_hci.h"
+	"ascon.h"
+	"libbungetpriv.h"
+
+1488843427 source:/home/marius/APPS/CPP/bunget/src/libbunget/uguid.cpp
+	"uguid.h"
+
+1493079394 source:/home/marius/APPS/CPP/bunget/src/libbunget/bu_hci.cpp
+	<assert.h>
+	"bybuff.h"
+	"bu_hci.h"
+	"libbungetpriv.h"
+	<iostream>
+
+1493079891 source:/home/marius/APPS/CPP/bunget/src/libbunget/hci_socket.cpp
+	"uguid.h"
+	"bu_hci.h"
+	"hci_socket.h"
+	"l2cap_socket.h"
+	"include/libbunget.h"
+
+1493078986 source:/home/marius/APPS/CPP/bunget/src/libbunget/libbungetpriv.cpp
+	<assert.h>
+	"bungetconf.h"
+	"libbungetpriv.h"
+	"ascon.h"
+	"bu_gap.h"
+	"bu_gatt.h"
+	"hci_config.h"
+
+1488844241 /home/marius/APPS/CPP/bunget/src/libbunget/bungetconf.h
+
+1488843429 /home/marius/APPS/CPP/bunget/src/libbunget/hci_config.h
+

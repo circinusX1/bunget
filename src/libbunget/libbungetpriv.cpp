@@ -588,3 +588,5 @@ IServer* ContextImpl::new_server(ISrvProc* proc, int hcidev, const char* name, i
     }
     return  _adapters[hcidev];
 }
+
+

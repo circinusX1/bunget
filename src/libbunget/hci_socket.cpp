@@ -117,6 +117,23 @@ int hci_socket_ble::bind_raw(int* devId)
         }
     }
     _loops++;
+    //added from BLuetoothHciSocket.cpp
+    // get the local address and address type
+    struct hci_dev_info di;
+    ::memset(&di, 0x00, sizeof(di));
+    di.dev_id = this->_devId;
+    ::memset(_address, 0, sizeof(_address));
+    _addressType = 0;
+    if (::ioctl(this->_sock, HCIGETDEVINFO, (void *)&di) > -1)
+    {
+        ::memcpy(_address, &di.bdaddr, sizeof(di.bdaddr));
+        _addressType = int(di.type);
+        if (_addressType == 3)
+        {
+        // 3 is a weird type, use 1 (public) instead
+            _addressType = 1;
+        }
+    }
     return this->_devId;
 }
 
@@ -190,7 +207,7 @@ int hci_socket_ble::read(uint8_t* buffer, int sizeb)
     int length = bt_socket::read(buffer, sizeb);
     if (length > 0 && this->_mode == HCI_CHANNEL_RAW)
     {
-        /// TODO deal with random disconnects ?!?
+        this->_tweakHciKernel(sizeb, buffer);
     }
     return length;
 }
@@ -299,5 +316,56 @@ void hci_socket_ble::_notify_read()
         packed.data = data;
         packed.len = (uint16_t)len;
         _hci->on_sock_data(0, packed);
+    }
+}
+
+// taken from BluetoothHciSocket.cpp
+void hci_socket_ble::_tweakHciKernel(int length, uint8_t* data)
+{
+  if (length == 22 && data[0] == 0x04 &&
+        data[1] == 0x3e &&
+        data[2] == 0x13 &&
+        data[3] == 0x01 &&
+        data[4] == 0x00)
+    {
+        int l2socket;
+        struct sockaddr_l2 l2a;
+        unsigned short l2cid;
+        unsigned short handle = *((unsigned short*)(&data[5]));
+
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+    l2cid = ATT_CID;
+#elif __BYTE_ORDER == __BIG_ENDIAN
+    l2cid = bswap_16(ATT_CID);
+#endif
+
+        l2socket = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
+
+        ::memset(&l2a, 0, sizeof(l2a));
+        l2a.l2_family = AF_BLUETOOTH;
+        l2a.l2_cid = l2cid;
+        ::memcpy(&l2a.l2_bdaddr, _address, sizeof(l2a.l2_bdaddr));
+        l2a.l2_bdaddr_type = (uint8_t)_addressType;
+        ::bind(l2socket, (struct sockaddr*)&l2a, sizeof(l2a));
+
+        ::memset(&l2a, 0, sizeof(l2a));
+        l2a.l2_family = AF_BLUETOOTH;
+        ::memcpy(&l2a.l2_bdaddr, &data[9], sizeof(l2a.l2_bdaddr));
+        l2a.l2_cid = l2cid;
+        l2a.l2_bdaddr_type = data[8] + 1; // BDADDR_LE_PUBLIC (0x01), BDADDR_LE_RANDOM (0x02)
+
+        ::connect(l2socket, (struct sockaddr *)&l2a, sizeof(l2a));
+
+        this->_l2sockets[handle] = l2socket;
+    }
+    else if (length == 7 && data[0] == 0x04 && data[1] == 0x05 && data[2] == 0x04 && data[3] == 0x00)
+    {
+        unsigned short handle = *((unsigned short*)(&data[4]));
+
+        if (this->_l2sockets.count(handle) > 0)
+        {
+            ::close(this->_l2sockets[handle]);
+            this->_l2sockets.erase(handle);
+        }
     }
 }

@@ -802,6 +802,16 @@ void bu_hci::_onmeta(const no_evt_le_meta_event* leme)
     {
         TRACE("EVT_LE_LTK_REQUEST" );
     }
+    else if(leme->leMetaEventType == EVT_LE_READ_REMOTE_USED_FEATURES_COMPLETE)
+    {
+#define EVT_LE_READ_REMOTE_USED_FEATURES_COMPLETE	0x04
+typedef struct {
+	uint8_t		status;
+	uint16_t	handle;
+	uint8_t		features[8];
+} __attribute__ ((packed)) evt_le_read_remote_used_features_complete;
+#define EVT_LE_READ_REMOTE_USED_FEATURES_COMPLETE_SIZE 11
+    }
     else
         TRACE("UNKNOWN META EVENT " << std::hex <<leme->leMetaEventType );
 }
