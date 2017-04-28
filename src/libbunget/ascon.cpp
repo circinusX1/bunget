@@ -40,7 +40,12 @@ void bu_asc::write(uint16_t cid, const bybuff& data)
     sdata sd;
     sd.data = data.buffer();
     sd.len = uint16_t(data.length());
+#ifdef ONGOING
+    _hci->enque_acl(_handle, cid, sd);
+#else
     _hci->write_ack_packet(_handle, cid, sd);
+#endif
+
 }
 
 /****************************************************************************************

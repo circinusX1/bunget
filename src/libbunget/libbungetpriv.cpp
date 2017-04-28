@@ -109,33 +109,8 @@ void SrvDevice::run()
 */
 void SrvDevice::on_configure_device(int devid)
 {
-    char name[128];
-
     _status = eINITALISING;
-
-    system("service bluetoothd stop");
-    system("service bluetooth stop");
-    system("sudo systemctl stop bluetooth");
-    system("rfkill unblock bluetooth");
-    ::sprintf(name,"hciconfig hci%d down", _hcidev);
-    system(name);
-    ::usleep(100000);
-    ::sprintf(name,"hciconfig hci%d up", _hcidev);
-    system(name);
-  //  system("hciconfig hci0 sspmode 0");
- //   system("hciconfig hci0 nosecmgr");
- //   system("hciconfig hci0 noencrypt");
-//    system("hciconfig hci0 noauth");
-//    system("hciconfig hci0 noleadv");
-//    system("hciconfig hci0 noscan");
-
-    ::sprintf(name,"hciconfig hci%d name  %s", _hcidev, _name.c_str());
-    system(name);
-    ::sprintf(name,"hciconfig hci%d piscan", _hcidev);
-    system(name);
-    ::sprintf(name,"hciconfig hci%d leadv", _hcidev);
-    system(name);
-    printf("%s", "done dirty work\n");
+    _cb_proc->initHciDevice(devid, _name.c_str());
 }
 
 /****************************************************************************************
@@ -163,6 +138,16 @@ int     SrvDevice::advertise(bool onoff)
             on_configure_device(_hcidev);
 
             _hci = new bu_hci(this);
+            
+            /*
+            bybuff buff;
+            buff << "444444444444444444444444444444444444444444444444444444444444444444444444444444";
+            sdata sd;
+            sd.data=buff.buffer();
+            sd.len=buff.length();
+            _hci->enque_acl(1,1,sd);
+            */
+            
             if(!_hci->init(_hcidev, false))
             {
                 delete _hci;
@@ -331,6 +316,12 @@ void SrvDevice::on_read_version(uint8_t hciver, uint16_t hcirev, uint8_t lmpver,
     _lmpver=lmpver;
     _man=man;
     _lmpsubver=lmpsubver;
+    if (_man == 2) {  // INTEL
+        _gatt->setMaxMtu(23);
+    }
+    else if (_man == 93){// RALTEK
+        _gatt->setMaxMtu(23);
+    }
 }
 
 /****************************************************************************************

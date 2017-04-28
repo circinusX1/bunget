@@ -50,6 +50,7 @@ public:
     int write_descr(GHandler* pel);
     bu_asc*  pacl(){return  _pacls;}
     void    reset();
+    void setMaxMtu(int mtu){_maxMtu=mtu;}
 private:
     int _dummy_q(const sdata& data, bybuff& ret);
     int _group_q(const sdata& data, bybuff& ret);

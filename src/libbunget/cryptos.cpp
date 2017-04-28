@@ -103,18 +103,17 @@ void cryptos::_sha_encrypt(const bybuff& key, const bybuff& data, bybuff& out)
     uint8_t iv[ CryptoPP::AES::BLOCKSIZE ] = {0};
     std::string encoded;
     try{
-    /**
+#if 0
         CryptoPP::AES::Encryption                       aesEncryption(key.buffer(), key.length());
         CryptoPP::CBC_Mode_ExternalCipher::Encryption   cbcEncryption( aesEncryption, iv );
         CryptoPP::StreamTransformationFilter            stfEncryptor(cbcEncryption, new CryptoPP::StringSink( encoded ) );
         stfEncryptor.Put( data.buffer(), (size_t)data.length() );
         stfEncryptor.MessageEnd();
         out = encoded;
-
         TRACE("_sha_e(" << key.to_string() <<","<< data.to_string() <<")=" << out.to_string());
         bybuff r;
         _sha_decrypt(key, out, r);
-    */
+#endif //0
 
         CryptoPP::ECB_Mode< CryptoPP::AES >::Encryption aes_128_ecb;//(key.buffer(), key.length(), iv);
         aes_128_ecb.SetKey( key.buffer(), key.length() );

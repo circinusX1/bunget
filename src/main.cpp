@@ -36,6 +36,7 @@
 #include <time.h>
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/select.h>
 #include <termios.h>
 #include <stropts.h>
@@ -74,6 +75,7 @@ class my_proc : public ISrvProc
 {
 public:
     my_proc();
+    bool initHciDevice(int devid, const char* name);
     void onServicesDiscovered(std::vector<IHandler*>& els);
     void onReadRequest(IHandler* pc);
     int onSubscribesNotify(IHandler* pc, bool b);
@@ -124,7 +126,7 @@ int main(int n, char* v[])
 
     std::cout << "Version 1.0.0 March 9 2017 \n";
     try{
-        IServer*    BS =  ctx->new_server(&procedure, dev, "linuxhp", 9);
+        IServer*    BS =  ctx->new_server(&procedure, dev, "testing", 0);
         //BS->set_name("advname"); // this is the bt name.
 
         if(n==3 && v[2][0]=='b') //beacon mode
@@ -152,7 +154,7 @@ int main(int n, char* v[])
 
         BS->run();
         BS->stop();
-
+ 
     }
     catch(bunget::hexecption& ex)
     {
@@ -172,6 +174,38 @@ my_proc::my_proc()
     _prepare_gpio17();
 }
 
+/****************************************************************************************
+*/
+bool my_proc::initHciDevice(int devid, const char* devn)
+{
+  
+    char name[128];
+    // system("service bluetoothd stop");
+    // system("service bluetooth stop");
+    // system("sudo systemctl stop bluetooth");
+    // system("rfkill unblock bluetooth");
+    ::sprintf(name,"hciconfig hci%d down", devid);
+    system(name);
+    ::usleep(100000);
+    ::sprintf(name,"hciconfig hci%d up", devid);
+    system(name);
+    system("hciconfig hci0 sspmode 0");
+    system("hciconfig hci0 nosecmgr");
+    system("hciconfig hci0 noencrypt");
+    system("hciconfig hci0 noauth");
+    system("hciconfig hci0 noleadv");
+    system("hciconfig hci0 noscan");
+
+    ::sprintf(name,"hciconfig hci%d name  %s", devid, devn);
+    system(name);
+    ::sprintf(name,"hciconfig hci%d piscan", devid);
+    system(name);
+    ::sprintf(name,"hciconfig hci%d leadv", devid);
+    system(name);
+    printf("%s", "done dirty work\n");
+    
+    return true;
+}
 
 /****************************************************************************************
 */

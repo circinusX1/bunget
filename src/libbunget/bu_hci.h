@@ -37,6 +37,7 @@
 #define LE_SET_ADVERTISING_PARAMETERS_CMD CMD_OPCODE_PACK(OCF_LE_SET_ADVERTISING_PARAMETERS, OGF_LE_CTL)
 
 
+
 struct hci_error
 {
     int         nerror;
@@ -65,6 +66,7 @@ typedef struct {
 #define NO_EVT_CMD_COMPLETE 		0x0E
 typedef struct
 {
+	 uint8_t   ncmd;
      uint16_t   cmd;
      uint8_t    status;
      uint8_t    data[0];
@@ -89,13 +91,26 @@ typedef struct {
 	uint16_t		len;
 	uint16_t		expectedlen;
 	std::vector<uint8_t>   byarr;
-}  no_acl_start_len_dynamic;
+} no_acl_start_len_dynamic;
+
+typedef struct{
+	uint16_t handler;
+	uint16_t packet;
+}__attribute__ ((packed)) no_acl_handler_packet;
 
 
-struct bt_hci_evt_hdr {
+typedef struct{
+	uint16_t handle;
+	uint16_t cid;
+	uint16_t sequence;
+	bybuff   byarr;
+}  queu_acl_item;
+
+
+typedef struct  {
 	uint8_t  evt;
 	uint8_t  plen;
-} __attribute__ ((packed));
+} __attribute__ ((packed)) bt_hci_evt_hdr;
 
 #define BT_H4_CMD_PKT	0x01
 #define BT_H4_ACL_PKT	0x02
@@ -198,17 +213,23 @@ public:
     void read_rssi(uint16_t handle);
     void write_ack_packet(uint16_t handle, uint16_t cid, const sdata& datah);
     void reset();
+    void reset_buffers();
     void read_baddr();
     bool start(int delay=0);
     SrvDevice* srv()const{ return _pev;}
     bool check_dev_state();
     int read_local_name();
     void write_local_name(const char* name);
+    void enque_acl(uint16_t handle, uint16_t cid, const sdata& sd);
+    void write_acl_chunk();
     virtual void on_error(const hci_error& error);
     virtual bool onSpin(bt_socket* sock);
     virtual int on_sock_data(uint8_t code, const sdata& buffer);
 
 protected:
+    void _drain_out_queue();
+    void _le_read_buffer_size();
+    void _read_buffer_size();
     int  _on_hci_data(uint8_t code, const sdata& buffer);
     int  _on_acl_data(uint8_t code, const sdata& buffer);
     void _oncmd_complette(const no_evt_cmd_complete* nevcc);
@@ -227,13 +248,12 @@ protected:
     void _set_adv_params(uint16_t mini=1, uint16_t mmaxi=4, uint8_t advtype=9);
     void _onhci_state_chnaged(HCI_STATE);
     void _write_sock(const uint8_t* pt, size_t sz){
-        if(_delay)
-            ::usleep(_delay);
-        int ret = _socket->write(pt, sz);
+        int ret = _socket->writeocts(pt, sz);
         if((size_t)ret != sz)
         {
             _THROW("socket send error");
         }
+        if(_delay)::usleep(_delay);
     }
     template <typename T>void _write_sock(const T& t, size_t sz=sizeof(T))
     {
@@ -243,7 +263,7 @@ protected:
             _THROW("socket send error");
         }
     }
-    void _clear_cache();
+    void _clear();
     bool _recreate_sock();
 
 private:
@@ -258,6 +278,11 @@ private:
     bool                _connected;
     evt_disconn_complete _dcached;
     int                  _delay;
-    std::map<uint16_t,no_acl_start_len_dynamic*> _cache;
+    uint16_t            _aclMtu;
+    uint16_t            _aclPendingMax;
+    std::vector<queu_acl_item*> _aclOutQueue;
+    std::map<uint16_t,no_acl_start_len_dynamic*> _aclInQueue;
+    std::map<uint16_t, uint16_t> _aclPendingHandlers;	
+    bool                _usebuffessz;
 };
 #endif // NO_HCI_H

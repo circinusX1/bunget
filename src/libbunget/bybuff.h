@@ -117,6 +117,22 @@ public:
         for(int k=0;k<len;k++)
             _buff.push_back(buff[k]);
     }
+    
+    size_t getcount(size_t count){
+         return std::min(count, _buff.size());
+    }
+
+    size_t transfer(bybuff& to, size_t count)
+    {
+	size_t maxcount = std::min(count, _buff.size());
+    	for(size_t i=0;i < maxcount; i++){
+		    to << (this->_buff[i]);
+	}
+    	while(maxcount-- && this->_buff.size()){
+	    	this->_buff.erase(this->_buff.begin()); 
+        }
+	return _buff.size();	
+    }
 
     void pad(int octets)
     {

@@ -218,7 +218,8 @@ class ISrvProc
 {
 public:
     virtual ~ISrvProc() {}
-
+    
+    virtual bool initHciDevice(int devid, const char* name)=0;
     virtual void onServicesDiscovered(std::vector<IHandler*>& els)=0;
     virtual bool onSpin(IServer* ps)=0;
     virtual void onReadRequest(IHandler* pc)=0;
