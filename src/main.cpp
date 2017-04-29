@@ -126,7 +126,11 @@ int main(int n, char* v[])
 
     std::cout << "Version 1.0.0 March 9 2017 \n";
     try{
-        IServer*    BS =  ctx->new_server(&procedure, dev, "testing", 0);
+#ifndef XECHO
+        IServer*    BS =  ctx->new_server(&procedure, dev, "bunget", 10);
+#else        
+        IServer*    BS =  ctx->new_server(&procedure, dev, "echo", 10);
+#endif //        
         //BS->set_name("advname"); // this is the bt name.
 
         if(n==3 && v[2][0]=='b') //beacon mode
@@ -136,8 +140,13 @@ int main(int n, char* v[])
         }
         else
         {
-
-            IService*   ps = BS->add_service(0x123F,"demo");
+#ifdef XECHO
+            IService*   ps = BS->add_service(0x123F,"echo");
+            procedure.LedChr = ps->add_charact(UID_GPIO,PROPERTY_WRITE|PROPERTY_INDICATE|PROPERTY_NOTIFY,
+                                     0,
+                                     FORMAT_RAW, 1); // 1 / 0
+#else
+            IService*   ps = BS->add_service(0x123F,"bunget");
             procedure.LedChr = ps->add_charact(UID_GPIO,PROPERTY_WRITE|PROPERTY_INDICATE|PROPERTY_NOTIFY,
                                      0,
                                      FORMAT_RAW, 1); // 1 / 0
@@ -149,6 +158,7 @@ int main(int n, char* v[])
             procedure.Temp1Chr = ps->add_charact(UID_TEMP, PROPERTY_NOTIFY|PROPERTY_INDICATE,
                                       0,
                                       FORMAT_FLOAT, FORMAT_FLOAT_LEN); // we send it as float
+#endif //                                      
             BS->advertise(true);
         }
 
@@ -189,6 +199,7 @@ bool my_proc::initHciDevice(int devid, const char* devn)
     ::usleep(100000);
     ::sprintf(name,"hciconfig hci%d up", devid);
     system(name);
+	/*
     system("hciconfig hci0 sspmode 0");
     system("hciconfig hci0 nosecmgr");
     system("hciconfig hci0 noencrypt");
@@ -196,6 +207,7 @@ bool my_proc::initHciDevice(int devid, const char* devn)
     system("hciconfig hci0 noleadv");
     system("hciconfig hci0 noscan");
 
+ */
     ::sprintf(name,"hciconfig hci%d name  %s", devid, devn);
     system(name);
     ::sprintf(name,"hciconfig hci%d piscan", devid);
@@ -219,7 +231,7 @@ bool my_proc::onSpin(IServer* ps)
     }
 
     // notification
-    if(inawhile++%800==0)
+    if(inawhile++%1200==0)
     {
         if(_subscribed)
         {

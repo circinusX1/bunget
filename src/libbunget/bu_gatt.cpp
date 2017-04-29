@@ -142,15 +142,10 @@ int bu_gatt::on_sock_data(uint8_t code, const sdata& data)
 
     switch(rqt)
     {
-        case ATT_OP_MTU_RESP:
-        {
-            uint16_t mtu = oa2t<uint16_t>(data.data,1);
-            _mtu = mtu;
-        }
-        break;
         case ATT_OP_MTU_REQ://2
         {
             uint16_t mtu = oa2t<uint16_t>(data.data,1);
+			uint16_t mtu2 = htobs(mtu);
             if (mtu < 23)
                 mtu = 23;
             else if (mtu > _maxMtu)
@@ -237,26 +232,27 @@ int bu_gatt::_group_q(const sdata& data, bybuff& ret)
     Harray&                 handlers = srv()->handlers();
     int                     subservices = H_SRV;
 
-    if(g.as16() == GATT_PRIM_SVC_UUID || g.as16() == GATT_INCLUDE_UUID)
+
+	if(g.as16() != GATT_PRIM_SVC_UUID)
+		subservices =  H_SRV_INC;
+	for(const auto& e : handlers)
+	{
+		if(e->_hndl>he)break;
+		if(e->_hndl<hs)continue;
+		if(e->_type==subservices)
+		{
+			TRACE("Adding service: " << e->_hndl);
+			srvs.push_back((GattSrv*)e);
+		}
+	}
+	
+	size_t nsrvs = srvs.size();
+	if(nsrvs==0)
+	{
+		return _reply_err(ATT_OP_READ_BY_GROUP_REQ, hs, ATT_ECODE_ATTR_NOT_FOUND, ret);
+	}
+	if(g.as16() == GATT_PRIM_SVC_UUID || g.as16() == GATT_INCLUDE_UUID)
     {
-        if(g.as16() != GATT_PRIM_SVC_UUID)
-            subservices =  H_SRV_INC;
-        for(const auto& e : handlers)
-        {
-            if(e->_hndl>he)continue;
-            if(e->_hndl<hs)continue;
-            if(e->_type==subservices)
-            {
-                TRACE("Adding service: " << e->_hndl);
-                srvs.push_back((GattSrv*)e);
-            }
-        }
-        
-        size_t nsrvs = srvs.size();
-        if(nsrvs==0)
-        {
-            return _reply_err(ATT_OP_READ_BY_GROUP_REQ, hs, ATT_ECODE_ATTR_NOT_FOUND, ret);
-        }
         GattSrv* pgel = srvs[0];
         uint8_t  lengthPerService = pgel->_is128 ? 20 : 6;
         size_t   elems = std::min(size_t(( _mtu - 2 ) / lengthPerService), nsrvs);
@@ -302,7 +298,7 @@ int bu_gatt::_type_q(const sdata& data, bybuff& ret)
 
         for(const auto& e : handlers)
         {
-            if(e->_hndl>he)continue;
+            if(e->_hndl>he)break;
             if(e->_hndl<hs)continue;
             if(e->_type==H_CHR )
             {
@@ -347,7 +343,7 @@ int bu_gatt::_type_q(const sdata& data, bybuff& ret)
 
     for(const auto& e : handlers)
     {
-        if(e->_hndl>he)continue;
+        if(e->_hndl>he)break;
         if(e->_hndl<hs)continue;
         if((e->_type==H_CHR || e->_type==H_DSC) && g == e->_cuid)
         {
@@ -426,7 +422,7 @@ int bu_gatt::_info_q(const sdata& data, bybuff& ret)
 
     for(const auto& e : handlers)
     {
-        if(e->_hndl>he)continue;
+        if(e->_hndl>he)break;
         if(e->_hndl<hs)continue;
         uuid.reset();
         prev=(GHandler*)e;
@@ -632,7 +628,7 @@ int bu_gatt::_find_type_q(const sdata& data, bybuff& ret)
 
     for(const auto& e : handlers)
     {
-        if(e->_hndl>he)continue;
+        if(e->_hndl>he)break;
         if(e->_hndl<hs)continue;
         if(uuid==0x2800 && e->_type==H_SRV && e->_cuid == val16)
         {

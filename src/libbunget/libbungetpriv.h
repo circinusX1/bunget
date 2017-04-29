@@ -68,6 +68,7 @@ public:
     virtual void refresh();
     virtual void stop();
     virtual int set_name(const char* btname);
+    virtual void set_adv_interval(int intetv){_advinterval = intetv;}
     /// hci_event //
     virtual void on_disconnect(const evt_disconn_complete* evdc);
     virtual void on_encrypt_chnage(const evt_encrypt_change* pecc);
@@ -80,6 +81,7 @@ public:
     virtual void on_adv_enable(uint8_t status);
     virtual void on_rssi(uint16_t handle, uint8_t rssi);
     virtual void le_ltk_neg_reply(uint16_t handle);
+    virtual void le_get_adv_interval(int& interval)const;
     virtual void on_le_connected(uint8_t status,
                                 uint16_t handle, uint8_t role,
                                 HCI_ADDRTYPE addressType,
@@ -170,6 +172,7 @@ private:
     bool        _defaults;
     S_STATE     _status;
     int         _respdelay;
+    int         _advinterval;
     std::vector<hci_data_eater*> _eaters;
     std::vector<IService*>      _services;
 };

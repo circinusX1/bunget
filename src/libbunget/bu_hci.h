@@ -37,7 +37,6 @@
 #define LE_SET_ADVERTISING_PARAMETERS_CMD CMD_OPCODE_PACK(OCF_LE_SET_ADVERTISING_PARAMETERS, OGF_LE_CTL)
 
 
-
 struct hci_error
 {
     int         nerror;
@@ -133,6 +132,7 @@ typedef struct {
 
 enum HCI_STATE
 {
+    STATE_ZERO=0,
     STATE_UNSUPORTED=1,
     STATE_UNAUTHORISED,
     STATE_NETWORK_DOWN,
@@ -174,6 +174,7 @@ public:
     virtual void on_adv_enable(uint8_t status)=0;
     virtual void on_rssi(uint16_t handle, uint8_t rssi)=0;
     virtual void le_ltk_neg_reply(uint16_t handle)=0;
+    virtual void le_get_adv_interval(int& interval)const=0;
     virtual void on_le_connected(uint8_t status, uint16_t handle,
                                 uint8_t role,
                                 HCI_ADDRTYPE addressType,
@@ -237,7 +238,7 @@ protected:
     void _onle_complette(const no_evt_le_meta_event* neleme);
     void _onle_con_update_complette(const no_evt_le_meta_event* neleme);
     void _reconfigure();
-    void _spinpool(int lops=32);
+    void _spinpool(int lops=32, int callmain=true);
     void _set_hci_filter();
     void _set_event_mask();
     void _set_le_event_mask();
@@ -245,23 +246,22 @@ protected:
     void _read_baddr();
     void _write_le_host();
     void _read_le_hosts();
-    void _set_adv_params(uint16_t mini=1, uint16_t mmaxi=4, uint8_t advtype=9);
+    void _set_adv_params(int interval);
     void _onhci_state_chnaged(HCI_STATE);
     void _write_sock(const uint8_t* pt, size_t sz){
         int ret = _socket->writeocts(pt, sz);
-        if((size_t)ret != sz)
-        {
-            _THROW("socket send error");
-        }
         if(_delay)::usleep(_delay);
+		if(ret>0)_spinpool(0, false);
+        if((size_t)ret != sz)
+            _THROW("socket send error");
     }
     template <typename T>void _write_sock(const T& t, size_t sz=sizeof(T))
     {
         size_t ret = _socket->write(t, sz);
+		if(ret>0)_spinpool(0, false);
+        if(_delay)::usleep(_delay);
         if(ret != sz)
-        {
             _THROW("socket send error");
-        }
     }
     void _clear();
     bool _recreate_sock();

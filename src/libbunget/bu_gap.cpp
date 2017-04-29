@@ -135,7 +135,6 @@ void bu_gap::adv_beacon(const uint128_t& uuid,
     add << uint8_t(dl);
     add << bed;
     TRACE(add.to_string());
-
     _air_waveit(add, b);
     _idle(32);
 }

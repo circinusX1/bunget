@@ -257,20 +257,16 @@ int hci_socket_ble::_resolve_devid(int* pDevId, bool isUp)
 
 /****************************************************************************************
 */
-bool hci_socket_ble::pool(int* pbytes)
+bool hci_socket_ble::pool(int* pbytes, bool callhci)
 {
     fd_set          read;
     struct timeval  to;
-
-    if(pbytes){
-        *pbytes=0;
-    }
-
+	if(pbytes)*pbytes=0;
     FD_ZERO (&read);
     FD_SET (_sock, &read);
 
     to.tv_sec = 0;
-    to.tv_usec = 2000;
+    to.tv_usec = 128;
     int rv = ::select(_sock+1,&read,0,0,&to);
     if(rv < 0)
     {
@@ -282,16 +278,16 @@ bool hci_socket_ble::pool(int* pbytes)
     }
     if(rv==0)
     {
-        ::usleep(100);
-        return _hci->onSpin(this);
+        if(callhci)
+            return _hci->onSpin(this);
     }
     if(FD_ISSET(_sock, &read))
     {
         _notify_read();
         FD_CLR (_sock, &read);
-    }
-    if(pbytes){
-        *pbytes=rv;
+		if(pbytes){
+			*pbytes=rv;
+		}
     }
     return true;
 }
@@ -302,14 +298,15 @@ void hci_socket_ble::_notify_read()
 {
     uint8_t  data[512] = {0};
     sdata    packed;
-
+	
     int len = this->read(data, sizeof(data));
-    if(len <= 0)
+	if(len <= 0)
     {
         hci_error e;
         e.nerror = errno;
         e.message="netdown";
         _hci->on_error(e);
+		TRACE("socket error ...........");
     }
     else
     {

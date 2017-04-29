@@ -32,7 +32,7 @@ BtCtx::~BtCtx(){};
 /****************************************************************************************
 */
 SrvDevice::SrvDevice(ISrvProc* proc, int& hcid, const char* name, int delay):_cb_proc(proc),
-                    _def(false),_hcidev(hcid)
+                    _def(false),_hcidev(hcid),_advinterval(160)
 {
     _gapp = 0;
     _gatt = 0;
@@ -88,18 +88,10 @@ void SrvDevice::run()
 #else
     _hci->start(_respdelay);
     _running = true;
-
-    // flush socket
-    for(int k=0;k<100 && __alive;k++)
-    {
-        __alive = _hci->pool();
-        ::usleep(10000);
-    }
     _status = eRUNNING;
     while(__alive)
     {
         __alive = _hci->pool();
-        ::usleep(1000);
     }
     _status = eUNKNOWN;
 #endif
@@ -428,6 +420,11 @@ void SrvDevice::on_disconnect(const evt_disconn_complete* evdc)
     _eaters.clear();
 }
 
+void SrvDevice::le_get_adv_interval(int& interval)const
+{
+    interval = _advinterval;
+}
+
 /****************************************************************************************
 */
 void SrvDevice::on_le_connected(uint8_t status, uint16_t handle, uint8_t role,
@@ -438,7 +435,6 @@ void SrvDevice::on_le_connected(uint8_t status, uint16_t handle, uint8_t role,
     memcpy(&_address, &address,sizeof(bdaddr_t));
     _handle = handle;
     _gatt->reset();
-    assert(_pacl==0);
     if(_pacl!=0)
     {
         delete _pacl;

@@ -37,7 +37,7 @@ public:
     bool is_up();
     void set_filter(const uint8_t* data, int length);
     int read(uint8_t* buffer, int sizeb);
-    bool pool(int* pbytes=0);
+    bool pool(int* pbytes=0, bool callhci=true);
 #ifdef USE_UVLIB  /// this was not tested !?!
     static void uv_this_cb(uv_poll_t* handle, int status, int events);
     static void uv_this_cb_close(uv_poll_t* handle);
@@ -58,6 +58,8 @@ private:
     int         _loops;
     uint8_t     _address[8];
     int32_t     _addressType;
+	uint8_t		_buff[256];
+	int			_bytes;
 };
 
 #endif // HCI_SOCKET_H

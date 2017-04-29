@@ -47,16 +47,16 @@ const uint8_t*  t2o(T data, uint8_t* arr)
 template <class T>
 T oa2t(const uint8_t *bytes, size_t offset)
 {
-    uint8_t output[8]={0};
+	uint8_t input[4];
     for(unsigned int i = 0; i < sizeof(T); i++)
     {
 #if __BYTE_ORDER == __BIG_ENDIAN
-        output[i] = bytes[sizeof(T)-1-i+offset];
+        input[i] = bytes[sizeof(T)-1-i+offset];
 #else
-    	output[i] = bytes[i+offset];
+    	input[i] = bytes[i+offset];
 #endif
     }
-    return ((T)(*output));
+    return ((T)(*input));
 }
 
 template <class T>
@@ -124,14 +124,14 @@ public:
 
     size_t transfer(bybuff& to, size_t count)
     {
-	size_t maxcount = std::min(count, _buff.size());
+		size_t maxcount = std::min(count, _buff.size());
     	for(size_t i=0;i < maxcount; i++){
 		    to << (this->_buff[i]);
-	}
+		}
     	while(maxcount-- && this->_buff.size()){
 	    	this->_buff.erase(this->_buff.begin()); 
         }
-	return _buff.size();	
+		return _buff.size();	
     }
 
     void pad(int octets)
