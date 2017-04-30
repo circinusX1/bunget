@@ -1080,6 +1080,8 @@ bool bu_hci::check_dev_state()
             if (is_up)
             {
                 try{
+					reset(); 
+					::sleep(2);
                     _reconfigure();
                 }catch(...)
                 {
@@ -1136,14 +1138,27 @@ void bu_hci::read_baddr()
 void bu_hci::_spinpool(int lops, int callmain)
 {
     int i = lops;
-    int pbytes;
+    int pbytes = 0;
+    
+    if(lops==-1)
+    {
+		i=8912;
+		do{
+			_socket->pool(&pbytes,false);
+			if(--i==0)
+			{
+				_socket->stop(); // no response
+			}
+			::usleep(16);
+		}while(pbytes==0);
+		return;
+	}
+    
     while(--i>0){
         _socket->pool(&pbytes, callmain);
-        if(pbytes){
-			i += 32;
-		}
-        if(i>8912)
-        {
+        if(pbytes)
+			i++;
+        if(i>8912){ /*weird nonstop comming from kernel*/
             _socket->stop();
             break;
         }
@@ -1154,17 +1169,6 @@ void bu_hci::enque_acl(uint16_t handle, uint16_t cid, const sdata& sd)
 {
     TRACE(__FUNCTION__);
     
-    if(0) // !_usebuffessz)//sd.len < this->_aclMtu && _aclPendingHandlers.size()==0 && _aclInQueue.size())
-    {
-#ifdef DEBUG    
-    bybuff  trace(sd.data, sd.len);
-    TRACE ("NOT Chunking at: " << this->_aclMtu << " bytes");
-    TRACE("{\n--->["<< int(trace.length()) <<"]"<< trace.to_string());
-#endif 
-        this->write_ack_packet(handle, cid, sd);
-        return;
-    }
-        
     bybuff  aclbuf;
     uint16_t hf = (handle | (ACL_START_NO_FLUSH << 12));
 
@@ -1243,13 +1247,19 @@ void bu_hci::_reconfigure()
     this->_clear();
     this->_set_hci_filter();
     this->_set_event_mask();
+    _spinpool(-1, false);
     this->_set_le_event_mask();
+    _spinpool(-1, false);
     this->_read_version();
-    _spinpool(128,false);
+    _spinpool(-1, false);
 	this->_write_le_host();
+	_spinpool(-1, false);
     this->_read_le_hosts();
-	_spinpool(128,false);
+    _spinpool(-1, false);
     this->_read_baddr();
+    _spinpool(-1, false);
     this->_le_read_buffer_size();
-	_spinpool(128,false);
+    _spinpool(-1, false);
+    this->_read_buffer_size();
+    _spinpool(-1, false);
  }

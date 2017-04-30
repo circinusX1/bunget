@@ -238,7 +238,7 @@ protected:
     void _onle_complette(const no_evt_le_meta_event* neleme);
     void _onle_con_update_complette(const no_evt_le_meta_event* neleme);
     void _reconfigure();
-    void _spinpool(int lops=32, int callmain=true);
+    void _spinpool(int lops=8, int callmain=true);
     void _set_hci_filter();
     void _set_event_mask();
     void _set_le_event_mask();
@@ -251,14 +251,12 @@ protected:
     void _write_sock(const uint8_t* pt, size_t sz){
         int ret = _socket->writeocts(pt, sz);
         if(_delay)::usleep(_delay);
-		if(ret>0)_spinpool(0, false);
         if((size_t)ret != sz)
             _THROW("socket send error");
     }
     template <typename T>void _write_sock(const T& t, size_t sz=sizeof(T))
     {
         size_t ret = _socket->write(t, sz);
-		if(ret>0)_spinpool(0, false);
         if(_delay)::usleep(_delay);
         if(ret != sz)
             _THROW("socket send error");
