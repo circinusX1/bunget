@@ -3,7 +3,6 @@ PROJECT(bunget)
 
 include_directories ("./include")
 
-add_definitions(-DARM_CC)
 add_definitions(-DDEBUG)
 add_definitions(-DONGOING)
 #add_definitions(-DNO_USE_UVLIB )

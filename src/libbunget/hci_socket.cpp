@@ -85,6 +85,7 @@ void hci_socket_ble::uv_this_cb_close(uv_poll_t* handle)
 void hci_socket_ble::uv_this_cb(uv_poll_t* handle, int status, int events)
 {
     hci_socket_ble *p = (hci_socket_ble*)handle->data;
+	_bytes = this->read(_buff, sizeof(_buff);
     p->_notify_read();
 }
 #endif //
@@ -257,38 +258,55 @@ int hci_socket_ble::_resolve_devid(int* pDevId, bool isUp)
 
 /****************************************************************************************
 */
-bool hci_socket_ble::pool(int* pbytes, bool callhci)
+bool hci_socket_ble::pool(bool callhci)
 {
     fd_set          read;
     struct timeval  to;
-	if(pbytes)*pbytes=0;
+	int tout=10; // 1ms tout
+
     FD_ZERO (&read);
     FD_SET (_sock, &read);
 
-    to.tv_sec = 0;
-    to.tv_usec = 128;
-    int rv = ::select(_sock+1,&read,0,0,&to);
-    if(rv < 0)
-    {
-        hci_error e;
-        e.nerror = errno;
-        e.message="network-error";
-        _hci->on_error(e);
-        return false;
-    }
-    if(rv==0)
-    {
-        if(callhci)
-            return _hci->onSpin(this);
-    }
-    if(FD_ISSET(_sock, &read))
-    {
-        _notify_read();
-        FD_CLR (_sock, &read);
-		if(pbytes){
-			*pbytes=rv;
+	while(--tout>0){
+		to.tv_sec = 0;
+		to.tv_usec = 100;
+		int rv = ::select(_sock+1,&read,0,0,&to);
+		if(rv < 0)
+		{
+			hci_error e;
+			e.nerror = errno;
+			e.message="network-error";
+			_hci->on_error(e);
+			return false;
 		}
-    }
+		if(rv==0)
+		{
+			if(_bytes)
+				break;
+			::usleep(32);
+		}
+		if(FD_ISSET(_sock, &read))
+		{
+			FD_CLR (_sock, &read);
+			int len = this->read(_buff+_bytes, sizeof(_buff)-_bytes);
+			if(len > 0)
+				_bytes+=len;
+			else{
+				hci_error e;
+				e.nerror = errno;
+				e.message="netdown";
+				_hci->on_error(e);
+				TRACE("socket error ...........");
+				break;
+			}
+		}
+	
+	}
+	if(_bytes)
+		_notify_read();
+	if(callhci)
+		_hci->onSpin(this);
+
     return true;
 }
 
@@ -296,24 +314,11 @@ bool hci_socket_ble::pool(int* pbytes, bool callhci)
 */
 void hci_socket_ble::_notify_read()
 {
-    uint8_t  data[512] = {0};
-    sdata    packed;
-	
-    int len = this->read(data, sizeof(data));
-	if(len <= 0)
-    {
-        hci_error e;
-        e.nerror = errno;
-        e.message="netdown";
-        _hci->on_error(e);
-		TRACE("socket error ...........");
-    }
-    else
-    {
-        packed.data = data;
-        packed.len = (uint16_t)len;
-        _hci->on_sock_data(0, packed);
-    }
+	sdata    packed;
+	packed.data = _buff;
+	packed.len = (uint16_t)_bytes;
+	_hci->on_sock_data(0, packed);
+	_bytes = 0;
 }
 
 // taken from BluetoothHciSocket.cpp

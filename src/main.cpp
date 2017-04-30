@@ -231,7 +231,7 @@ bool my_proc::onSpin(IServer* ps)
     }
 
     // notification
-    if(inawhile++%1200==0)
+    if(inawhile++%100==0)
     {
         if(_subscribed)
         {

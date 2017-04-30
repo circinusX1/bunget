@@ -5,6 +5,7 @@ include_directories ("./include")
 
 add_definitions(-DARM_CC)
 add_definitions(-DDEBUG)
+add_definitions(-DONGOING)
 #add_definitions(-DNO_USE_UVLIB )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ")
@@ -14,7 +15,7 @@ add_library(bunget STATIC ascon.cpp
                              bt_incinpl.cpp
                              bt_socket.cpp
                              bu_gap.cpp
-                             bu_gatt.cc.o
+                             bu_gatt.cpp
                              bu_hci.cpp
                              bybuff.cpp
                              cryptos.cpp
@@ -28,4 +29,8 @@ add_library(bunget STATIC ascon.cpp
                              uguid.cpp)
 
 
+SET(LIBRARY_OUTPUT_PATH ../lib)
+#add_definitions( -DNO_USE_UVLIB )
+add_definitions( -DDEBUG )
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ")
 

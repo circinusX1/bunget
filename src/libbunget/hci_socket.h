@@ -22,7 +22,7 @@ class hci_socket_ble : public bt_socket
 public:
      hci_socket_ble(hci_data_eater* hci):bt_socket(hci),_devId(0),_adaptivespeed(LOOP_SLEEP_IDLE),
                         _loops(0),
-                        _addressType(0)
+                        _addressType(0),_bytes(0)
      {
         ::memset((void*)_address,0,sizeof(_address));
      }
@@ -37,7 +37,7 @@ public:
     bool is_up();
     void set_filter(const uint8_t* data, int length);
     int read(uint8_t* buffer, int sizeb);
-    bool pool(int* pbytes=0, bool callhci=true);
+    bool pool(bool callhci=true);
 #ifdef USE_UVLIB  /// this was not tested !?!
     static void uv_this_cb(uv_poll_t* handle, int status, int events);
     static void uv_this_cb_close(uv_poll_t* handle);
@@ -58,7 +58,7 @@ private:
     int         _loops;
     uint8_t     _address[8];
     int32_t     _addressType;
-	uint8_t		_buff[256];
+	uint8_t		_buff[512];
 	int			_bytes;
 };
 

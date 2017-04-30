@@ -475,7 +475,7 @@ void bu_hci::_read_buffer_size()
     {
         uint8_t(0),
         CMD_OPCODE_PACK(OCF_READ_BUFFER_SIZE, OGF_INFO_PARAM),
-        uint8_t(3)
+        uint8_t(0)
     };
     this->_socket->write(packet);
 }
@@ -624,7 +624,7 @@ int bu_hci::on_sock_data(uint8_t code, const sdata& buffer) //received
                 }
                 break;
             case EVT_CMD_COMPLETE:
-                scase="EVT_CMD_COMPLETE";
+                scase="       [EVT_CMD_COMPLETE]";
                 {
                     no_evt_cmd_complete* necc = (no_evt_cmd_complete*)(buffer.data+3);
                     necc->cmd=htobs(necc->cmd);
@@ -1081,7 +1081,7 @@ bool bu_hci::check_dev_state()
             {
                 try{
 					reset(); 
-					::sleep(2);
+					sleep(2);
                     _reconfigure();
                 }catch(...)
                 {
@@ -1137,32 +1137,7 @@ void bu_hci::read_baddr()
 */
 void bu_hci::_spinpool(int lops, int callmain)
 {
-    int i = lops;
-    int pbytes = 0;
-    
-    if(lops==-1)
-    {
-		i=8912;
-		do{
-			_socket->pool(&pbytes,false);
-			if(--i==0)
-			{
-				_socket->stop(); // no response
-			}
-			::usleep(16);
-		}while(pbytes==0);
-		return;
-	}
-    
-    while(--i>0){
-        _socket->pool(&pbytes, callmain);
-        if(pbytes)
-			i++;
-        if(i>8912){ /*weird nonstop comming from kernel*/
-            _socket->stop();
-            break;
-        }
-    }
+	_socket->pool(callmain);
 }
 
 void bu_hci::enque_acl(uint16_t handle, uint16_t cid, const sdata& sd)
@@ -1258,8 +1233,8 @@ void bu_hci::_reconfigure()
     _spinpool(-1, false);
     this->_read_baddr();
     _spinpool(-1, false);
-    this->_le_read_buffer_size();
-    _spinpool(-1, false);
     this->_read_buffer_size();
     _spinpool(-1, false);
- }
+    this->_le_read_buffer_size();
+    _spinpool(-1, false);
+}
