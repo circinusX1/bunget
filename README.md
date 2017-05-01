@@ -22,7 +22,19 @@ BUNGET is a C++ library for Linux which help to write GAP/GATT servers (Bluetoot
 Here is a simple C++ library which I hope would help to write GATT services. 
 
 Be advised! 
-BTLE is a messy protocol, Is designed by lawyers, not by engineeres) and Android LE mobile implementations (scanners/detecters) tend to be outdated and instable. I would recomend to test your environment using [arduiuipush](https://play.google.com/store/apps/details?id=com.ermote.ArduUiPush&hl=en) app from the store on Android and on Aple using PunchTru. If you are planning to write your own LE implementation on Android, I can help with the arduiuipush LE base class which is stable.
+BTLE is a messy protocol, Is designed by lawyers, not by engineeres) 
+Have a glimpse form the specification, don't panick.
+
+*For most commands, a Command Complete event shall be sent to the Host
+when the Controller completes the command. Some commands are executed
+in the background and do not return a Command Complete event when they
+have been completed. Instead, the Controller shall send a Command Status
+event back to the Host when it has begun to execute the command. When the
+actions associated with the command have finished, an event that is
+associated with the command shall be sent by the Controller to the Host*
+
+
+I  recomend to test your environment using [arduiuipush](https://play.google.com/store/apps/details?id=com.ermote.ArduUiPush&hl=en) app from the store on Android and on Aple using PunchTru. If you are planning to write your own LE implementation on Android, I can help with the arduiuipush LE base class which is stable.
 
 
 * Server only: GATT services characteristics, descriptors or beacons.
@@ -40,12 +52,6 @@ BTLE is a messy protocol, Is designed by lawyers, not by engineeres) and Android
  * check if there are any processes keeping BT up. (ps ax | grep blu )
  * Kill them all. Make sure they not restart.
   
-
-## Usage
-
-* Turn device running Linux system in to a GATT server. 
-   * *Soon all specific dev platforms for embedded custom chips will be replaced by Linux, pretty soon/Microsoft lost this battle*
-* Debug HCI clients
 
 ## Block Diagram:
 
