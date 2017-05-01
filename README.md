@@ -30,7 +30,7 @@ in the background and do not return a Command Complete event when they
 have been completed. Instead, the Controller shall send a Command Status
 event back to the Host when it has begun to execute the command. When the
 actions associated with the command have finished, an event that is
-associated with the command shall be sent by the Controller to the Host*
+associated with the command shall be sent by the Controller to the Host* ... got it ?
 
 
 I  recomend to test your environment using [arduiuipush](https://play.google.com/store/apps/details?id=com.ermote.ArduUiPush&hl=en) app from the store on Android and on Aple using PunchTru. If you are planning to write your own LE implementation on Android, I can help with the arduiuipush LE base class which is stable.
