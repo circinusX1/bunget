@@ -46,6 +46,7 @@ private:
     void _tweakHciKernel(int length, uint8_t* data);
     int _resolve_devid(int* pDevId, bool isUp);
     void _notify_read();
+	void _send_cmd(uint16_t ogf, uint16_t ocf, uint8_t plen, void *param);
 private:
     int         _devId;
     //std::map<uint16_t,l2cap_socket*> _l2sockets;

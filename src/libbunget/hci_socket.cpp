@@ -134,8 +134,30 @@ int hci_socket_ble::bind_raw(int* devId)
         // 3 is a weird type, use 1 (public) instead
             _addressType = 1;
         }
+		
+		if (hci_test_bit(HCI_INQUIRY, &di.flags))
+			_send_cmd(OCF_INQUIRY_CANCEL, OGF_LINK_CTL,0,0);
+		else
+			_send_cmd(OCF_EXIT_PERIODIC_INQUIRY, OGF_LINK_CTL,0,0);
     }
     return this->_devId;
+}
+
+void hci_socket_ble::_send_cmd(uint16_t ocf, uint16_t ogf, uint8_t plen, void *param)
+{
+    TRACE(__FUNCTION__);
+	TRACE("                 stop inquire me!!!!!!!!!!!");
+    uint8_t loco[512];
+    hci_command_hdr hc;
+
+    hc.opcode   = CMD_OPCODE_PACK(ocf, ogf);
+    hc.plen     = plen;
+
+    memcpy(loco, &hc, sizeof(hc));
+    if(plen)
+        memcpy(loco+sizeof(hc), param, plen);
+
+    writeocts(loco, plen+sizeof(hc));
 }
 
 /****************************************************************************************

@@ -578,10 +578,12 @@ int bu_hci::on_sock_data(uint8_t code, const sdata& buffer) //received
     std::string scase="NOT HANDLED ";
     bybuff  trace(buffer.data, buffer.len);
     TRACE("{-->["<< int(buffer.len) <<"]"<< trace.to_string());
+	
     if (HCI_EVENT_PKT == eventType)
     {
 		uint8_t  subEventType = buffer.data[1];    
 		TRACE("    Event:" << int(eventType) << ", subevent:" << int(subEventType));
+		
         switch(subEventType)
         {
             case EVT_DISCONN_COMPLETE:
@@ -647,11 +649,22 @@ int bu_hci::on_sock_data(uint8_t code, const sdata& buffer) //received
                     memcpy(&preq->bdaddr,&dest,sizeof(dest));
                 }
                 break;
-            case  EVT_CMD_STATUS:
+            case  EVT_CMD_STATUS: //OCF_AUTH_REQUESTED
                 scase="EVT_CMD_STATUS";
                 {
                     evt_cmd_status* pevs = (evt_cmd_status*)(buffer.data+4);
-                    size_t elll = 3 + sizeof(evt_cmd_status);
+					pevs->opcode = htobs(pevs->opcode);
+					uint16_t ogf = CMD_OPCODE_OGF(pevs->opcode);
+					uint16_t ocf = CMD_OPCODE_OCF(pevs->opcode);
+					
+					TRACE("CMD_STATUS status:" <<int(pevs->status)<<" ncmd:" <<
+												 int(pevs->ncmd) << " opcode(C/G):" << 
+												 std::hex<<int(ocf) <<"/"<<int(ogf) << std::dec);
+					if(ocf == OCF_EXIT_PERIODIC_INQUIRY)
+					{
+						//send_cmd(OCF_INQUIRY_CANCEL, OGF_LINK_CTL,0,0);
+					}
+					
                 }
                 break;
             case EVT_REMOTE_NAME_REQ_COMPLETE:
@@ -1220,8 +1233,11 @@ void bu_hci::_reconfigure()
     TRACE(__FUNCTION__);
     
     this->_clear();
+	
     this->_set_hci_filter();
     this->_set_event_mask();
+
+
     _spinpool(-1, false);
     this->_set_le_event_mask();
     _spinpool(-1, false);
@@ -1233,8 +1249,12 @@ void bu_hci::_reconfigure()
     _spinpool(-1, false);
     this->_read_baddr();
     _spinpool(-1, false);
-    this->_read_buffer_size();
-    _spinpool(-1, false);
     this->_le_read_buffer_size();
     _spinpool(-1, false);
+	if(_usebuffessz==false)
+	{
+		this->_read_buffer_size();
+		_spinpool(-1, false);
+	}
+	
 }
