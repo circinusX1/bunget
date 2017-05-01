@@ -22,8 +22,7 @@ BUNGET is a C++ library for Linux which help to write GAP/GATT servers (Bluetoot
 Here is a simple C++ library which I hope would help to write GATT services. 
 
 Be advised! 
-BTLE is a messy protocol, Is designed by lawyers, not by engineeres) 
-Have a glimpse form the specification, don't panick.
+BTLE is a messy protocol, Is designed by lawyers, not by engineeres) Have a glimpse at the specification, don't panick.
 
 *For most commands, a Command Complete event shall be sent to the Host
 when the Controller completes the command. Some commands are executed
