@@ -321,6 +321,7 @@ my_proc event: onSubscribesNotify:3403=1
 
 ####   R-PI 3
   - Does not work with onboard UART bt on R-PI 3 !!!.
+     - https://github.com/comarius/bunget/blob/master/docs/r-pi3-uartle.log
   - Linux minibian 4.4.17-v7+ #901 SMP Fri Aug 12 17:57:27 BST 2016 armv7l GNU/Linux
   - gcc (Raspbian 4.9.2-10) 4.9.2
   - g++ (Raspbian 4.9.2-10) 4.9.2
