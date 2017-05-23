@@ -310,15 +310,17 @@ my_proc event: onSubscribesNotify:3403=1
 - restart on the mobile the bluetooth service (off 5 seconds, then on / reboot recomanded on some chipsets)
 - Tweak the timout [0-64] in main ctx->new_server(&procedure, dev, hostname, <timeout>);
 
-### Tested on
+### Tested with broadcom BT4 dongle on:
 
    - Make sure any processes that uses BT is killed, otherwise the LE disconects, or fails to grab services.
 
 ####   C H I P
    - On board BT4 and default installed system. See the C H I P readme page.
+   - USB dongle broadcom
     
 
 ####   R-PI 3
+  - Does not work with onboard UART bt on R-PI 3 !!!.
   - Linux minibian 4.4.17-v7+ #901 SMP Fri Aug 12 17:57:27 BST 2016 armv7l GNU/Linux
   - gcc (Raspbian 4.9.2-10) 4.9.2
   - g++ (Raspbian 4.9.2-10) 4.9.2
