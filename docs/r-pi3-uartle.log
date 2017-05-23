@@ -185,7 +185,7 @@ HCI: ACL_START    }
 {-->[15]0240200A0006000500130102000000 
 REQ:  ----------> ATT_OP_WRITE_RESP
 HCI: ACL_START    } 
-{-->[13]043E0A0300400038000000D007 
+{-->[13]043E0A0300400038000000D007  
     Event:4, subevent:62 
 _onmeta 
 mm EVT_LE_CONN_UPDATE_COMPLETE 
@@ -194,18 +194,21 @@ uu handle = 64
 uu interval = 70 
 uu latency = 0 
 uu supervision timeout = 2080 
-HCI: EVT_LE_META_EVENT    } 
+
+HCI: EVT_LE_META_EVENT    }    <<<< === Here sends this status (1)
 {-->[7]040F0400010604 
     Event:4, subevent:15 
 CMD_STATUS status:1 ncmd:6 opcode(C/G):4/e 
+
 HCI: EVT_CMD_STATUS    } 
-{-->[7]04050400400016 
+{-->[7]04050400400016    <<<< == ON R-PI 3 HCI Socket Sends EVT_DISCONN_COMPLETE
     Event:4, subevent:5 
 enable_adv 
 
 <--[5]010A200101 
-my_proc event:  onAdvertized:1 
+my_proc event:  onAdvertized:1    
 my_proc event: onConnect: disconnected 
+
 HCI: EVT_DISCONN_COMPLETE    } 
 {-->[7]040E04010A2000 
     Event:4, subevent:14 
