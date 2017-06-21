@@ -148,7 +148,8 @@ int     SrvDevice::advertise(bool onoff)
             }
             _gapp =  new bu_gap(_hci);
             _gatt= new bu_gatt(_hci);
-            _gapp->advertise(_name.c_str(), _services, _pin);
+            _gatt->setMaxMtu(23);
+	    _gapp->advertise(_name.c_str(), _services, _pin);
         }
     }
     else
@@ -309,10 +310,10 @@ void SrvDevice::on_read_version(uint8_t hciver, uint16_t hcirev, uint8_t lmpver,
     _man=man;
     _lmpsubver=lmpsubver;
     if (_man == 2) {  // INTEL
-        _gatt->setMaxMtu(23);
+        if(_gatt)_gatt->setMaxMtu(23);
     }
     else if (_man == 93){// RALTEK
-        _gatt->setMaxMtu(23);
+        if(_gatt)_gatt->setMaxMtu(23);
     }
 }
 

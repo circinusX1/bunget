@@ -131,14 +131,15 @@ int hci_socket_ble::bind_raw(int* devId)
         _addressType = int(di.type);
         if (_addressType == 3)
         {
-        // 3 is a weird type, use 1 (public) instead
             _addressType = 1;
         }
-		
-		if (hci_test_bit(HCI_INQUIRY, &di.flags))
-			_send_cmd(OCF_INQUIRY_CANCEL, OGF_LINK_CTL,0,0);
-		else
-			_send_cmd(OCF_EXIT_PERIODIC_INQUIRY, OGF_LINK_CTL,0,0);
+/*
+	if (hci_test_bit(HCI_INQUIRY, &di.flags))
+		_send_cmd(OCF_INQUIRY_CANCEL, OGF_LINK_CTL,0,0);
+	else
+		_send_cmd(OCF_EXIT_PERIODIC_INQUIRY, OGF_LINK_CTL,0,0);
+*/
+
     }
     return this->_devId;
 }
@@ -284,14 +285,14 @@ bool hci_socket_ble::pool(bool callhci)
 {
     fd_set          read;
     struct timeval  to;
-	int tout=10; // 1ms tout
+    int tout=10; //10ms
 
     FD_ZERO (&read);
     FD_SET (_sock, &read);
 
 	while(--tout>0){
 		to.tv_sec = 0;
-		to.tv_usec = 100;
+		to.tv_usec = 1000;
 		int rv = ::select(_sock+1,&read,0,0,&to);
 		if(rv < 0)
 		{

@@ -55,8 +55,8 @@ bool bu_hci::init(int& devid, bool userchannel)
             _socket->bind_user(&devid);
         else
             _socket->bind_raw(&devid);
-//        reset();
-//        ::sleep(1);
+        reset();
+        ::sleep(1);
     }
     catch(hexecption& e)
     {
@@ -576,8 +576,7 @@ int bu_hci::on_sock_data(uint8_t code, const sdata& buffer) //received
     uint8_t  eventType = buffer.data[0];
     uint16_t blen = buffer.len;
     std::string scase="NOT HANDLED ";
-    bybuff  trace(buffer.data, buffer.len);
-    TRACE("{-->["<< int(buffer.len) <<"]"<< trace.to_string());
+
 	
     if (HCI_EVENT_PKT == eventType)
     {
@@ -1093,8 +1092,8 @@ bool bu_hci::check_dev_state()
             if (is_up)
             {
                 try{
-					reset(); 
-					sleep(2);
+			reset(); 
+			sleep(2);
                     _reconfigure();
                 }catch(...)
                 {
@@ -1150,7 +1149,9 @@ void bu_hci::read_baddr()
 */
 void bu_hci::_spinpool(int lops, int callmain)
 {
-	_socket->pool(callmain);
+    if(lops<0)lops=32;
+    while(--lops)
+        _socket->pool(callmain);
 }
 
 void bu_hci::enque_acl(uint16_t handle, uint16_t cid, const sdata& sd)
@@ -1233,28 +1234,19 @@ void bu_hci::_reconfigure()
     TRACE(__FUNCTION__);
     
     this->_clear();
-	
-    this->_set_hci_filter();
-    this->_set_event_mask();
+    	this->_set_hci_filter();
+    	_spinpool(-1, false);
+    	this->_set_event_mask();
+    	_spinpool(-1, false);
+    	this->_set_le_event_mask();
+    	_spinpool(-1, false);
+    	this->_read_version();
+    	_spinpool(-1, false);
+    	this->_write_le_host();
+    	_spinpool(-1, false);
+    	this->_read_le_hosts();
+    	_spinpool(-1, false);
+    	this->_read_baddr();
+    	_spinpool(-1, false);
 
-
-    _spinpool(-1, false);
-    this->_set_le_event_mask();
-    _spinpool(-1, false);
-    this->_read_version();
-    _spinpool(-1, false);
-	this->_write_le_host();
-	_spinpool(-1, false);
-    this->_read_le_hosts();
-    _spinpool(-1, false);
-    this->_read_baddr();
-    _spinpool(-1, false);
-    this->_le_read_buffer_size();
-    _spinpool(-1, false);
-	if(_usebuffessz==false)
-	{
-		this->_read_buffer_size();
-		_spinpool(-1, false);
-	}
-	
 }

@@ -127,7 +127,7 @@ int main(int n, char* v[])
     std::cout << "Version 1.0.0 March 9 2017 \n";
     try{
 #ifndef XECHO
-        IServer*    BS =  ctx->new_server(&procedure, dev, "bunget", 10);
+        IServer*    BS =  ctx->new_server(&procedure, dev, "bunget", 64);
 #else        
         IServer*    BS =  ctx->new_server(&procedure, dev, "echo", 10);
 #endif //        
@@ -199,7 +199,6 @@ bool my_proc::initHciDevice(int devid, const char* devn)
     ::usleep(100000);
     ::sprintf(name,"hciconfig hci%d up", devid);
     system(name);
-	/*
     system("hciconfig hci0 sspmode 0");
     system("hciconfig hci0 nosecmgr");
     system("hciconfig hci0 noencrypt");
@@ -207,7 +206,6 @@ bool my_proc::initHciDevice(int devid, const char* devn)
     system("hciconfig hci0 noleadv");
     system("hciconfig hci0 noscan");
 
- */
     ::sprintf(name,"hciconfig hci%d name  %s", devid, devn);
     system(name);
     ::sprintf(name,"hciconfig hci%d piscan", devid);
