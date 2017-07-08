@@ -31,7 +31,7 @@ bu_gatt::bu_gatt(bu_hci* hci):_hci(hci),_indicator(0)
 */
 void    bu_gatt::reset()
 {
-    _maxMtu  =  256;
+    _maxMtu  =  23;
     _mtu     =  23;
     _preparedWriteRequest  =  0;
     _uidsize = 2;
@@ -241,7 +241,7 @@ int bu_gatt::_group_q(const sdata& data, bybuff& ret)
 		if(e->_hndl<hs)continue;
 		if(e->_type==subservices)
 		{
-			TRACE("Adding service: " << e->_hndl);
+            TRACE("Adding service: " << e->_hndl);
 			srvs.push_back((GattSrv*)e);
 		}
 	}

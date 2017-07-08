@@ -41,7 +41,7 @@
 #define ATT_CID             4
 
 
-#define _THROW(ex)      {::perror("see last function call"); /*throw bunget::hexecption(__FILE__,__FUNCTION__,errno,ex);*/}
+#define _THROW(ex)      {::perror(""); throw bunget::hexecption(__FILE__,__FUNCTION__,errno,ex);}
 #define _TRACEF()       std::cout << __FILE__ << " / " << __LINE__ << "\n"
 #define LOOP_SLEEP_IDLE      1000
 #define LOOP_SLEEP_NORM      100

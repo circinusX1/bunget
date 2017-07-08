@@ -60,7 +60,7 @@ public:
     int set_btname(const char* name);
 private:
     void _air_waveit(const bybuff& advData, const bybuff& scanData);
-    void _idle(int i);
+    void _idle();
 private:
     bu_hci*  _hci;
 };

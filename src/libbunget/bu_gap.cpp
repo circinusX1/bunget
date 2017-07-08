@@ -50,20 +50,21 @@ void bu_gap::advertise(const std::string& name,
 {
     if(srvs.size())
     {
-        bybuff  adv;
+        bybuff  advData;
         bybuff  scn;
 
-        adv << (uint8_t)0x2 << (uint8_t)0x1 << (uint8_t)0x6;
-        adv<<(uint8_t(1+2*srvs.size())) << (uint8_t(3));
+        advData << uint8_t(0x2) << uint8_t(0x1) << uint8_t(0x6);
+        advData<<(uint8_t(1 + 2 * srvs.size())) << (uint8_t(0x3));
         for(const auto  &s : srvs)
         {
             GattSrv* ps = dynamic_cast<GattSrv*>(s);
             uint16_t uid = ps->_cuid.as16();
-            adv << uid;
+            advData << uid;
         }
+
         scn<<uint8_t(1+name.length())<<uint8_t(0x8);
         scn<<name;
-        _air_waveit(adv, scn);
+        _air_waveit(advData, scn);
     }
 }
 
@@ -83,11 +84,11 @@ void bu_gap::stop_adv()
 
 /****************************************************************************************
 */
+#define DOUBLE_ADV
 void bu_gap::_air_waveit(const bybuff& add, const bybuff& scd)
 {
     sdata sd;
-#if defined (INTEL_EDISON) || defined (EMBEDDED_YOCTO)
-#else
+#ifdef DOUBLE_ADV
     sd.len = scd.length();
     sd.data = (uint8_t*)scd.buffer();
     _hci->set_sca_res_data(sd);
@@ -95,6 +96,7 @@ void bu_gap::_air_waveit(const bybuff& add, const bybuff& scd)
     sd.len = add.length();
     sd.data = (uint8_t*)add.buffer();
     _hci->set_adv_data(sd);
+    ::usleep(1000);
 #endif
     _hci->enable_adv(true);
     sd.len = scd.length();
@@ -104,7 +106,7 @@ void bu_gap::_air_waveit(const bybuff& add, const bybuff& scd)
     sd.len = add.length();
     sd.data = (uint8_t*)add.buffer();
     _hci->set_adv_data(sd);
-    _idle(32);
+    _idle();
 }
 
 /****************************************************************************************
@@ -121,7 +123,7 @@ void bu_gap::adv_beacon(const uint128_t& uuid,
     bed << uint128_t(uuid);
     bed << uint16_t(bswap_16(major)) << uint16_t(bswap_16(minor)) << uint8_t(power);
 
-    TRACE(bed.to_string());
+    _TRACE(bed.to_string());
     //1111111111111111111111111111111100040064e000
     //1111111111111111111111111111111100640004E0
     uint8_t dl = bed.length();
@@ -134,9 +136,9 @@ void bu_gap::adv_beacon(const uint128_t& uuid,
     add << uint8_t(0x2C);
     add << uint8_t(dl);
     add << bed;
-    TRACE(add.to_string());
+    _TRACE(add.to_string());
     _air_waveit(add, b);
-    _idle(32);
+    _idle();
 }
 
 /****************************************************************************************
@@ -163,9 +165,7 @@ void bu_gap::set_pin(uint32_t pin)
 
 /****************************************************************************************
 */
-void bu_gap::_idle(int i)
+void bu_gap::_idle()
 {
-    if(i<0 || i>1000)i=100;
-    while(--i>0)
-        _hci->pool();
+    _hci->pool();
 }

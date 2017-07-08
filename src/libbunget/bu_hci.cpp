@@ -21,18 +21,17 @@ bu_hci::bu_hci(SrvDevice* psrv):_pev(psrv),
                                 _isDevUp(false),
                                 _state(STATE_ZERO),
                                 _chekingdev(false),
-                                _connected(false),
-                                _usebuffessz(false)
+                                _connected(false)
 {
 #ifdef ARM_CC
-    _delay = 16384;
+    _delay = 8912;
 #else
-    _delay = 2048;
+    _delay = 1024;
 #endif
     _socket = new hci_socket_ble(this);
     //taken from bleno
     _aclMtu = 27;
-    _aclPendingMax = 2;
+    _aclPendingMax = 3;
 }
 
 /****************************************************************************************
@@ -55,8 +54,8 @@ bool bu_hci::init(int& devid, bool userchannel)
             _socket->bind_user(&devid);
         else
             _socket->bind_raw(&devid);
-        reset();
-        ::sleep(1);
+//        reset();
+//        ::sleep(1);
     }
     catch(hexecption& e)
     {
@@ -80,7 +79,7 @@ bool bu_hci::start(int delay)
 */
 void bu_hci::_set_hci_filter()
 {
-    TRACE(__FUNCTION__);
+    _TRACE(__FUNCTION__);
     struct  _PAACK8
     {
         uint32_t    filter0;
@@ -116,7 +115,7 @@ void bu_hci::_set_hci_filter()
 */
 void bu_hci::_set_event_mask()
 {
-    TRACE(__FUNCTION__);
+    _TRACE(__FUNCTION__);
     struct  _PAACK8
     {
         hcihr   _hcihr;
@@ -147,7 +146,7 @@ void bu_hci::_set_event_mask()
 */
 void bu_hci::_set_le_event_mask()
 {
-    TRACE(__FUNCTION__);
+    _TRACE(__FUNCTION__);
     struct  _PAACK8
     {
         hcihr   _hcihr;
@@ -178,7 +177,7 @@ void bu_hci::_set_le_event_mask()
 */
 void bu_hci::_read_version()
 {
-    TRACE(__FUNCTION__);
+    _TRACE(__FUNCTION__);
     hcihr   cmd =
     {
         HCI_COMMAND_PKT,
@@ -192,7 +191,7 @@ void bu_hci::_read_version()
 */
 void bu_hci::_read_baddr()
 {
-    TRACE(__FUNCTION__);
+    _TRACE(__FUNCTION__);
     hcihr   cmd =
     {
         HCI_COMMAND_PKT,
@@ -206,7 +205,7 @@ void bu_hci::_read_baddr()
 */
 void bu_hci::_write_le_host()
 {
-    TRACE(__FUNCTION__);
+    _TRACE(__FUNCTION__);
     struct  _PAACK8
     {
         hcihr                       hdr;
@@ -230,7 +229,7 @@ void bu_hci::_write_le_host()
 */
 void bu_hci::_read_le_hosts()
 {
-    TRACE(__FUNCTION__);
+    _TRACE(__FUNCTION__);
     hcihr cmd =
     {
         HCI_COMMAND_PKT,
@@ -244,7 +243,7 @@ void bu_hci::_read_le_hosts()
 */
 void bu_hci::_set_adv_params(int interval)
 {
-    TRACE(__FUNCTION__);
+    _TRACE(__FUNCTION__);
     struct  _PAACK8
     {
         hcihr   _hcihr;
@@ -275,7 +274,7 @@ void bu_hci::_set_adv_params(int interval)
 */
 void bu_hci::reset()
 {
-    TRACE(__FUNCTION__);
+    _TRACE(__FUNCTION__);
     hcihr    hdr =
     {
         HCI_COMMAND_PKT,
@@ -289,7 +288,7 @@ void bu_hci::reset()
 */
 void bu_hci::set_adv_data(const sdata& data)
 {
-    TRACE(__FUNCTION__);
+    _TRACE(__FUNCTION__);
     struct _PAACK8
     {
         hcihr    hdr;
@@ -318,7 +317,7 @@ void bu_hci::set_adv_data(const sdata& data)
 */
 void bu_hci::set_sca_res_data(const sdata& data)
 {
-    TRACE(__FUNCTION__);
+    _TRACE(__FUNCTION__);
     struct  _PAACK8
     {
         hcihr    hdr;
@@ -345,7 +344,7 @@ void bu_hci::set_sca_res_data(const sdata& data)
 */
 void bu_hci::enable_adv(uint8_t enable)
 {
-    TRACE(__FUNCTION__);
+    _TRACE(__FUNCTION__);
     struct  _PAACK8
     {
         hcihr   hdr;
@@ -367,7 +366,7 @@ void bu_hci::enable_adv(uint8_t enable)
 */
 void bu_hci::disconnect(uint16_t handle, uint8_t reason)
 {
-    TRACE(__FUNCTION__);
+    _TRACE(__FUNCTION__);
     struct  _PAACK8
     {
         hcihr   hdr;
@@ -392,7 +391,7 @@ void bu_hci::disconnect(uint16_t handle, uint8_t reason)
 */
 void bu_hci::read_rssi(uint16_t handle)
 {
-    TRACE(__FUNCTION__);
+    _TRACE(__FUNCTION__);
     struct  _PAACK8
     {
         hcihr       hdr;
@@ -410,42 +409,9 @@ void bu_hci::read_rssi(uint16_t handle)
 }
 
 
-
-/****************************************************************************************
-*/
-void bu_hci::write_ack_packet(uint16_t handle, uint16_t cid, const sdata& data)
-{
-    TRACE(__FUNCTION__);
-    struct  _PAACK8
-    {
-        struct  _PAACK8
-        {
-            uint8_t a;
-            uint16_t b;
-            uint16_t c;
-            uint16_t len;
-            uint16_t cid;
-        } hdr;
-        uint8_t  pck[512]; /*enough well see*/
-    }
-    cmd={
-            {
-                (uint8_t)HCI_ACLDATA_PKT,
-                (uint16_t)(btohs((uint16_t)(handle | (ACL_START_NO_FLUSH << 12)))),
-                (uint16_t)(data.len + 4),
-                (uint16_t)(btohs((uint16_t)(data.len))),
-                (uint16_t)(btohs(cid)),
-            },
-        {0}
-    };
-    ::memcpy(cmd.pck, data.data, std::min((size_t)data.len, size_t(512)));
-    _write_sock(cmd, data.len+sizeof(cmd.hdr));
-}
-
-
 void bu_hci::_le_read_buffer_size()
 {
-    TRACE(__FUNCTION__);
+    _TRACE(__FUNCTION__);
     struct _PAACK8
     {
         uint8_t hdr;
@@ -454,7 +420,7 @@ void bu_hci::_le_read_buffer_size()
     }
     packet =
     {
-        uint8_t(0),
+        uint8_t(1),
         CMD_OPCODE_PACK(OCF_LE_READ_BUFFER_SIZE, OGF_LE_CTL),
         uint8_t(0)
     };
@@ -464,7 +430,7 @@ void bu_hci::_le_read_buffer_size()
 
 void bu_hci::_read_buffer_size()
 {
-    TRACE(__FUNCTION__);
+    _TRACE(__FUNCTION__);
      struct _PAACK8
     {
         uint8_t hdr;
@@ -484,7 +450,7 @@ void bu_hci::_read_buffer_size()
 */
 void bu_hci::write_local_name(const char* name)
 {
-    TRACE(__FUNCTION__);
+    _TRACE(__FUNCTION__);
     
     change_local_name_cp cp;
     memset(&cp, 0, sizeof(cp));
@@ -496,7 +462,7 @@ void bu_hci::write_local_name(const char* name)
 */
 int bu_hci::read_local_name()
 {
-    TRACE(__FUNCTION__);
+    _TRACE(__FUNCTION__);
     read_local_name_rp rp;
     send_cmd(OCF_READ_LOCAL_NAME, OGF_HOST_CTL, READ_LOCAL_NAME_RP_SIZE, &rp);
     return 0;
@@ -506,7 +472,7 @@ int bu_hci::read_local_name()
 */
 void bu_hci::send_cmd(uint16_t ocf, uint16_t ogf, uint8_t plen, void *param)
 {
-    TRACE(__FUNCTION__);
+    _TRACE(__FUNCTION__);
     uint8_t loco[512];
     hci_command_hdr hc;
 
@@ -539,6 +505,7 @@ bool bu_hci::onSpin(bt_socket* sock) //received
 bool bu_hci::pool()
 {
     bool rv  = true;
+
     if(check_dev_state() && _socket->valid())
     {
         if(_socket->pool()==false)
@@ -549,7 +516,6 @@ bool bu_hci::pool()
     {
         rv = _pev->onSpin();
     }
-    
     return rv;
 }
 
@@ -557,16 +523,14 @@ bool bu_hci::pool()
 */
 void bu_hci::_clear()
 {
-    for(auto  &el : _aclInQueue)
+    for(auto  &el : _aclIn)
     {
         no_acl_start_len_dynamic* pd = el.second;
         delete pd;
     }
-    _aclInQueue.clear();
-    for(auto& a : _aclOutQueue)
-        delete a;
-    _aclOutQueue.clear();
-    _aclPendingHandlers.clear();	
+    _aclIn.clear();
+    _aclOut.clear();
+    _aclPending.clear();
 }
 
 /****************************************************************************************
@@ -576,12 +540,13 @@ int bu_hci::on_sock_data(uint8_t code, const sdata& buffer) //received
     uint8_t  eventType = buffer.data[0];
     uint16_t blen = buffer.len;
     std::string scase="NOT HANDLED ";
-
+    bybuff  trace(buffer.data, buffer.len);
+    TRACE("{-->["<< int(buffer.len) <<"]"<< trace.to_string());
 	
     if (HCI_EVENT_PKT == eventType)
     {
 		uint8_t  subEventType = buffer.data[1];    
-		TRACE("    Event:" << int(eventType) << ", subevent:" << int(subEventType));
+        //_TRACE("    Event:" << int(eventType) << ", subevent:" << int(subEventType));
 		
         switch(subEventType)
         {
@@ -589,27 +554,10 @@ int bu_hci::on_sock_data(uint8_t code, const sdata& buffer) //received
                 scase="EVT_DISCONN_COMPLETE";
                 {
                     evt_disconn_complete* pdc = (evt_disconn_complete*)(buffer.data+4);
-                    pdc->handle=htobs(pdc->handle);
+                    pdc->handle = htobs(pdc->handle);
                     memcpy(&_dcached, pdc, sizeof(_dcached));
 #ifdef ONGOING
-                    const auto& ai = _aclPendingHandlers.find(pdc->handle);
-                    if(ai!=_aclPendingHandlers.end())
-                    {
-                        TRACE("DELETE PENDING: " << int(pdc->handle));
-                        _aclPendingHandlers.erase(ai);
-                    }
-                    std::vector<queu_acl_item*>::iterator b = _aclOutQueue.begin();
-                    for(; b!= _aclOutQueue.end(); ++b)
-                    {
-                        if((*b)->handle==pdc->handle)
-                        {
-                            TRACE("DELETE QUE: " << int(pdc->handle));
-                                delete (*b);
-                            _aclOutQueue.erase(b);
-                            break;
-                        }
-                    }
-                    _drain_out_queue();
+                    flush_acl();
 #endif //ONGOING
                     _clear();
                     _pev->on_disconnect(pdc);
@@ -656,7 +604,7 @@ int bu_hci::on_sock_data(uint8_t code, const sdata& buffer) //received
 					uint16_t ogf = CMD_OPCODE_OGF(pevs->opcode);
 					uint16_t ocf = CMD_OPCODE_OCF(pevs->opcode);
 					
-					TRACE("CMD_STATUS status:" <<int(pevs->status)<<" ncmd:" <<
+                    TRACE("CMD_STATUS status:" <<int(pevs->status)<<" ncmd:" <<
 												 int(pevs->ncmd) << " opcode(C/G):" << 
 												 std::hex<<int(ocf) <<"/"<<int(ogf) << std::dec);
 					if(ocf == OCF_EXIT_PERIODIC_INQUIRY)
@@ -678,40 +626,32 @@ int bu_hci::on_sock_data(uint8_t code, const sdata& buffer) //received
                 scase="EVT_NUM_COMP_PKTS";
                 {
                     uint8_t	nhandles = uint8_t(buffer.data[3]);
-                    TRACE("GOT Pending handlers:" << int(nhandles));
-                    for(uint8_t h=0;h<nhandles;h++)
+                    TRACE("GOT number of completted acl packets:" << int(nhandles));
+                    for(uint8_t h=0; h<nhandles; h++)
                     {
                         no_acl_handler_packet* pconfirm = (no_acl_handler_packet*)(buffer.data + 4 + (h*4));
-                        pconfirm->handler=htobs(pconfirm->handler);
-                        pconfirm->packet=htobs(pconfirm->packet);
+                        pconfirm->handler = htobs(pconfirm->handler);
+                        pconfirm->packet = htobs(pconfirm->packet);
                         
                         TRACE("GOT Pending handler:" << int(pconfirm->handler) << ", " << int(pconfirm->packet));
                         
-                        const auto& ah = _aclPendingHandlers.find(pconfirm->handler);
-                        if(ah == this->_aclPendingHandlers.end())
+                        const auto& ah = _aclPending.find(pconfirm->handler);
+                        if(ah == this->_aclPending.end())
                         {
-                            TRACE("HANDLER NOT FOUND");
+                            TRACE("HANDLER "<<  int(pconfirm->handler)  <<" NOT FOUND");
                             continue;
-                        
                         }
-                        if(pconfirm->packet > ah->second){
-                            TRACE("DELETE HANDLER packet" << int(ah->second));
-                            _aclPendingHandlers.erase(ah);
-                        }
-                        else{
-                            TRACE("CONFIRM " << int(pconfirm->packet) << "," << int(ah->second));
-                            if(pconfirm->packet<=ah->second)
-                                ah->second -= pconfirm->packet;
-                            else 
-                                ah->second=0;
-                            if(ah->second==0)
+                        else
+                        {
+                            ah->second -= pconfirm->packet;
+                            if(ah->second <= 0)
                             {
-                                TRACE("DELETE HANDLER packet" << int(ah->second));
-                                _aclPendingHandlers.erase(ah);
+                                TRACE("DELETE ALL HANDLER packets:" <<",["<<int(pconfirm->handler) <<"]" << int(ah->second));
+                                _erase_AclOut(ah->first);
                             }
                         }
                     }
-                    _drain_out_queue();
+                    this->flush_acl();
         }
         break;
 #endif //ONGOING
@@ -748,20 +688,20 @@ int bu_hci::on_sock_data(uint8_t code, const sdata& buffer) //received
 			}
 			else
 			{
-				/// assert(_aclInQueue.find(handle) == _aclInQueue.end());
+                /// assert(_aclIn.find(handle) == _aclIn.end());
 				//accumulate data bt handler
-				if(_aclInQueue.find(handle) == _aclInQueue.end())
+                if(_aclIn.find(handle) == _aclIn.end())
 				{
 					no_acl_start_len_dynamic* pd = new(no_acl_start_len_dynamic);
 					pd->cit = (cid);
 					pd->len = (chunklen);
 					pd->expectedlen = (expectedlen);
 					pd->byarr.insert(pd->byarr.end(), sd.data, sd.data + sd.len);
-					_aclInQueue[handle] = pd;
+                    _aclIn[handle] = pd;
 				}
 				else
 				{
-					TRACE("ERROR AHNDLER NOT FOUND ....!. \n" << handle);
+                    _TRACE("ERROR AHNDLER NOT FOUND ....!. \n" << handle);
 				}
 			}
 
@@ -774,8 +714,8 @@ int bu_hci::on_sock_data(uint8_t code, const sdata& buffer) //received
 
             scase="ACL_CONT";
 
-            auto el = _aclInQueue.find(handle);
-            if (el == _aclInQueue.end())
+            auto el = _aclIn.find(handle);
+            if (el == _aclIn.end())
                 return true;
 
             no_acl_start_len_dynamic* pd = el->second;
@@ -789,16 +729,16 @@ int bu_hci::on_sock_data(uint8_t code, const sdata& buffer) //received
                 sd.data = &pd->byarr[0];
                 _pev->on_acl_packet(handle, pd->cit, sd);
                 delete pd;
-                _aclInQueue.erase(handle);
+                _aclIn.erase(handle);
             }
         }
         else
         {
-            TRACE("!!! HCI_ACLDATA_PKT  unknown flag: " << std::hex << int(flags) << std::dec);
+            _TRACE("!!! HCI_ACLDATA_PKT  unknown flag: " << std::hex << int(flags) << std::dec);
         }
     }
     else{
-       TRACE("!!!  NO KNOWN on_sock_data EVENTTYPE " << std::hex << int(eventType) << std::dec );
+       _TRACE("!!!  NO KNOWN on_sock_data EVENTTYPE " << std::hex << int(eventType) << std::dec );
     }
     TRACE("HCI: " << scase << "    }");
     return true;
@@ -808,7 +748,7 @@ int bu_hci::on_sock_data(uint8_t code, const sdata& buffer) //received
 */
 void bu_hci::on_error(const hci_error& error)
 {
-    TRACE(__FUNCTION__);
+    _TRACE(__FUNCTION__);
     if (error.message == "network-error")
     {
         this->_onhci_state_chnaged(STATE_NETWORK_DOWN);
@@ -824,26 +764,28 @@ void bu_hci::_oncmd_complette(const no_evt_cmd_complete* nevcc)
     switch(nevcc->cmd)
     {
         case RESET_CMD:
-             TRACE("    RESET_CMD");
+             _TRACE("    RESET_CMD");
+             reset();
+             sleep(2);
             _reconfigure();
             break;
         case WRITE_LE_HOST_SUPPORTED_CMD:
             {
-                TRACE("    cc WRITE_LE_HOST_SUPPORTED_CMD");
+                _TRACE("    cc WRITE_LE_HOST_SUPPORTED_CMD");
                 uint8_t le = nevcc->data[0];
                 uint8_t simul = nevcc->data[1];
             }
             break;
         case READ_LE_HOST_SUPPORTED_CMD:
             {
-                TRACE("    cc READ_LE_HOST_SUPPORTED_CMD");
+                _TRACE("    cc READ_LE_HOST_SUPPORTED_CMD");
                 uint8_t le = nevcc->data[0];
                 uint8_t simul = nevcc->data[1];
             }
             break;
         case READ_LOCAL_VERSION_CMD:
             {
-                TRACE("    cc READ_LOCAL_VERSION_CMD");
+                _TRACE("    cc READ_LOCAL_VERSION_CMD");
                 uint8_t  hciVer = nevcc->data[0];
                 if (hciVer < 0x06)
                 {
@@ -866,61 +808,61 @@ void bu_hci::_oncmd_complette(const no_evt_cmd_complete* nevcc)
             break;
         case READ_BD_ADDR_CMD:
             {
-                TRACE("    cc READ_BD_ADDR_CMD");
+                _TRACE("    cc READ_BD_ADDR_CMD");
                 memcpy(&_address, nevcc->data, sizeof(bdaddr_t));
                 _addrtype = ADDR_PUBLIC;
                 _pev->on_mac_change(_address);
                 char out[32];
                 ba2str(&_address, out);
-                TRACE("    BADDR: " << out);
+                _TRACE("    BADDR: " << out);
             }
             break;
         case LE_SET_ADVERTISING_PARAMETERS_CMD:
-            TRACE("    cc LE_SET_ADVERTISING_PARAMETERS_CMD");
+            _TRACE("    cc LE_SET_ADVERTISING_PARAMETERS_CMD");
             _onhci_state_chnaged(STATE_POWEREDON);
             _pev->on_adv_status(_state);
             break;
         case LE_SET_ADVERTISING_DATA_CMD:
-            TRACE("    cc LE_SET_ADVERTISING_DATA_CMD");
+            _TRACE("    cc LE_SET_ADVERTISING_DATA_CMD");
             _pev->on_adv_data_status(nevcc->status);
-            TRACE("======= READY TO ACCEPT CONNECTIONS ======");
+            _TRACE("======= READY TO ACCEPT CONNECTIONS ======");
             break;
         case LE_SET_SCAN_RESPONSE_DATA_CMD:
-            TRACE("    cc LE_SET_SCAN_RESPONSE_DATA_CMD");
+            _TRACE("    cc LE_SET_SCAN_RESPONSE_DATA_CMD");
             _pev->on_scan_resp_datat_status(nevcc->status);
             break;
         case LE_SET_ADVERTISE_ENABLE_CMD:
-            TRACE("    cc LE_SET_ADVERTISE_ENABLE_CMD");
+            _TRACE("    cc LE_SET_ADVERTISE_ENABLE_CMD");
             _pev->on_adv_enable(nevcc->status);
-            TRACE("======= READY TO ACCEPT CONNECTIONS ======");
+            _TRACE("======= READY TO ACCEPT CONNECTIONS ======");
             break;
         case READ_RSSI_CMD:
             {
-                TRACE("    cc READ_RSSI_CMD");
+                _TRACE("    cc READ_RSSI_CMD");
                 handle =  oa2t<uint16_t>(nevcc->data,0); //result.readUInt16LE(0);
                 uint8_t rssi = nevcc->data[2];
                 _pev->on_rssi(handle, rssi);
             }
             break;
         case LE_LTK_NEG_REPLY_CMD:
-            TRACE("    cc LE_LTK_NEG_REPLY_CMD");
+            _TRACE("    cc LE_LTK_NEG_REPLY_CMD");
             handle =  oa2t<uint16_t>(nevcc->data,0);
             _pev->le_ltk_neg_reply(handle);
             break;
         case CMD_OPCODE_PACK(OCF_HOLD_MODE,OGF_LINK_POLICY):
             {
-                TRACE("    cc CMD_OPCODE_PACK(OCF_HOLD_MODE,OGF_LINK_POLICY)");
+                _TRACE("    cc CMD_OPCODE_PACK(OCF_HOLD_MODE,OGF_LINK_POLICY)");
                 hold_mode_cp* hmcp = (hold_mode_cp*)nevcc->data;
             }
             break;
         case CMD_OPCODE_PACK(OCF_INQUIRY,OGF_LINK_CTL):
             {
-                TRACE("    cc CMD_OPCODE_PACK(OCF_INQUIRY,OGF_LINK_CTL)");
+                _TRACE("    cc CMD_OPCODE_PACK(OCF_INQUIRY,OGF_LINK_CTL)");
             }
             break;
         case CMD_OPCODE_PACK(OCF_LE_READ_BUFFER_SIZE,OGF_LE_CTL):
             {
-                TRACE("    cc CMD_OPCODE_PACK(OCF_LE_READ_BUFFER_SIZE,OGF_LE_CTL)");
+                _TRACE("    cc CMD_OPCODE_PACK(OCF_LE_READ_BUFFER_SIZE,OGF_LE_CTL)");
                 
                 uint16_t mtu = oa2t<uint16_t>(nevcc->data, 0);
                 uint16_t maxmtu = oa2t<uint8_t>(nevcc->data, 2);
@@ -929,22 +871,20 @@ void bu_hci::_oncmd_complette(const no_evt_cmd_complete* nevcc)
                 } else {
                     _aclMtu=mtu;
                     _aclPendingMax=maxmtu;
-                    _usebuffessz = true;
-                    TRACE("  xxx  cc OCF_LE_READ_BUFFER_SIZE: mtu=" << _aclMtu << ", pendingMax=" << maxmtu);
+                    TRACE("OCF_LE_READ_BUFFER_SIZE: mtu=" << int(_aclMtu) << ", pendingMax=" << int(maxmtu));
                 }
             }
             break;
         case CMD_OPCODE_PACK(OCF_READ_BUFFER_SIZE,OGF_INFO_PARAM):
             {
-                 TRACE("    cc CMD_OPCODE_PACK(OCF_READ_BUFFER_SIZE,OGF_INFO_PARAM)");
+                 _TRACE("    cc CMD_OPCODE_PACK(OCF_READ_BUFFER_SIZE,OGF_INFO_PARAM)");
                 if (nevcc->status==0) {
                     uint16_t mtu = oa2t<uint16_t>(nevcc->data, 0);
                     uint16_t maxmtu = oa2t<uint16_t>(nevcc->data, 3);
                     if(mtu && maxmtu){
                         _aclMtu=mtu;
                         _aclPendingMax=maxmtu;
-                        _usebuffessz = true;
-                        TRACE("  xxx  cc OCF_READ_BUFFER_SIZE: mtu=" << _aclMtu << ", pendingMax=" << maxmtu);
+                        TRACE("OCF_READ_BUFFER_SIZE: mtu=" << int(_aclMtu) << ", pendingMax=" << int(maxmtu));
                     }
                 }
             }
@@ -952,20 +892,20 @@ void bu_hci::_oncmd_complette(const no_evt_cmd_complete* nevcc)
             case CMD_OPCODE_PACK(OCF_SET_EVENT_MASK,OGF_HOST_CTL):
                 {
                     bybuff trace;
-                    TRACE("    cc CMD_OPCODE_PACK(OCF_SET_EVENT_MASK,OGF_HOST_CTL)");
+                    _TRACE("    cc CMD_OPCODE_PACK(OCF_SET_EVENT_MASK,OGF_HOST_CTL)");
                     set_event_mask_cp* p = (set_event_mask_cp*)nevcc->data;
                     trace.append(p->mask, 8);
-                    TRACE("BT-Mask:" << trace.to_string());
+                    _TRACE("BT-Mask:" << trace.to_string());
                     
                 }
             break;
             case CMD_OPCODE_PACK(OCF_SET_EVENT_MASK,OGF_LE_CTL):
                 {
                     bybuff trace;
-                    TRACE("    cc CMD_OPCODE_PACK(OCF_SET_EVENT_MASK,OGF_LE_CTL)");
+                    _TRACE("    cc CMD_OPCODE_PACK(OCF_SET_EVENT_MASK,OGF_LE_CTL)");
                     set_event_mask_cp* p = (set_event_mask_cp*)nevcc->data;
                     trace.append(p->mask, 8);
-                    TRACE("LE-Mask:" << trace.to_string());
+                    _TRACE("LE-Mask:" << trace.to_string());
                     
                 }
             break;
@@ -973,7 +913,7 @@ void bu_hci::_oncmd_complette(const no_evt_cmd_complete* nevcc)
             {
                 uint16_t ogf = CMD_OPCODE_OGF(nevcc->cmd);
                 uint16_t ocf = CMD_OPCODE_OCF(nevcc->cmd);
-                TRACE("    cc UNK command: OCF=" << std::hex <<
+                _TRACE("    cc UNK command: OCF=" << std::hex <<
                                                 int(ocf) <<
                                                 ", OGF=" << int(ogf) << std::dec);
             }
@@ -985,16 +925,16 @@ void bu_hci::_oncmd_complette(const no_evt_cmd_complete* nevcc)
 */
 void bu_hci::_onmeta(const no_evt_le_meta_event* leme)
 {
-    TRACE(__FUNCTION__);
+    _TRACE(__FUNCTION__);
     if (leme->leMetaEventType == EVT_LE_CONN_COMPLETE)
     {
-        TRACE("mm EVT_LE_CONN_COMPLETE" );
+        _TRACE("mm EVT_LE_CONN_COMPLETE" );
         this->_onle_complette(leme);
         _connected=true;
     }
     else if (leme->leMetaEventType == EVT_LE_CONN_UPDATE_COMPLETE)
     {
-        TRACE("mm EVT_LE_CONN_UPDATE_COMPLETE" );
+        _TRACE("mm EVT_LE_CONN_UPDATE_COMPLETE" );
         this->_onle_con_update_complette(leme);
     }
     else if(leme->leMetaEventType == EVT_LE_ADVERTISING_REPORT)
@@ -1002,31 +942,31 @@ void bu_hci::_onmeta(const no_evt_le_meta_event* leme)
         le_advertising_info* lead = (le_advertising_info*)leme->data;
         char bsttr[32];
 
-        TRACE("mm EVT_LE_ADVERTISING_REPORT" );
+        _TRACE("mm EVT_LE_ADVERTISING_REPORT" );
         ba2str(&lead->bdaddr, bsttr);
-        TRACE("EV TYPE = " << (int)lead->evt_type);
-        TRACE("BADDR_TYPE = " << (int)lead->bdaddr_type);
-        TRACE("ADDR TYPE = " << (int)lead->bdaddr_type);
-        TRACE("MAC = " << (const char*)bsttr);
-        TRACE("LENGTH = " << (int)lead->length);
+        _TRACE("EV TYPE = " << (int)lead->evt_type);
+        _TRACE("BADDR_TYPE = " << (int)lead->bdaddr_type);
+        _TRACE("ADDR TYPE = " << (int)lead->bdaddr_type);
+        _TRACE("MAC = " << (const char*)bsttr);
+        _TRACE("LENGTH = " << (int)lead->length);
     }
     else if(leme->leMetaEventType == EVT_LE_LTK_REQUEST)
     {
-        TRACE("mm EVT_LE_LTK_REQUEST" );
+        _TRACE("mm EVT_LE_LTK_REQUEST" );
     }
     else if(leme->leMetaEventType == EVT_LE_READ_REMOTE_USED_FEATURES_COMPLETE)
     {
-        TRACE("mm EVT_LE_READ_REMOTE_USED_FEATURES_COMPLETE" );
+        _TRACE("mm EVT_LE_READ_REMOTE_USED_FEATURES_COMPLETE" );
     }
     else
-        TRACE("mm UNKNOWN META EVENT " << std::hex <<leme->leMetaEventType );
+        _TRACE("mm UNKNOWN META EVENT " << std::hex <<leme->leMetaEventType );
 }
 
 /****************************************************************************************
 */
 void bu_hci::_onle_complette(const no_evt_le_meta_event* leme)
 {
-    TRACE(__FUNCTION__);
+    _TRACE(__FUNCTION__);
     uint16_t handle = oa2t<uint16_t>(leme->data,0);
     uint8_t role = leme->data[2];
     HCI_ADDRTYPE addressType = leme->data[3]== 0x01 ? ADDR_RANDOM : ADDR_PUBLIC;
@@ -1048,11 +988,8 @@ void bu_hci::_onle_complette(const no_evt_le_meta_event* leme)
     TRACE("cc latency = " << (int)latency);
     TRACE("cc supervision timeout = " << (int)supervisionTimeout);
     TRACE("cc master clock accuracy = " << (int)masterClockAccuracy);
-    std::map<uint16_t, uint16_t>::iterator it = this->_aclPendingHandlers.find(handle);
-    if(it != this->_aclPendingHandlers.end()){
-        TRACE("erasing pending handler " << int(handle));
-        this->_aclPendingHandlers.erase(it);
-    }
+
+    _erase_AclOut(handle);
     _pev->on_le_connected(leme->leMetaEventStatus, handle, role, addressType, addr,
                             interval, latency, supervisionTimeout, masterClockAccuracy);
 }
@@ -1061,7 +998,7 @@ void bu_hci::_onle_complette(const no_evt_le_meta_event* leme)
 */
 void bu_hci::_onle_con_update_complette(const no_evt_le_meta_event* leme)
 {
-    TRACE(__FUNCTION__);
+    _TRACE(__FUNCTION__);
     uint16_t handle = oa2t<uint16_t>(leme->data,0);
     uint16_t interval = oa2t<uint16_t>(leme->data,2) * 1.25;
     uint16_t latency = oa2t<uint16_t>(leme->data,4); // TODO: multiplier?
@@ -1092,8 +1029,8 @@ bool bu_hci::check_dev_state()
             if (is_up)
             {
                 try{
-			reset(); 
-			sleep(2);
+					reset(); 
+					sleep(2);
                     _reconfigure();
                 }catch(...)
                 {
@@ -1147,83 +1084,9 @@ void bu_hci::read_baddr()
 
 /****************************************************************************************
 */
-void bu_hci::_spinpool(int lops, int callmain)
+void bu_hci::_poolsocket(int msecs, int callmain)
 {
-    if(lops<0)lops=32;
-    while(--lops)
-        _socket->pool(callmain);
-}
-
-void bu_hci::enque_acl(uint16_t handle, uint16_t cid, const sdata& sd)
-{
-    TRACE(__FUNCTION__);
-    
-    bybuff  aclbuf;
-    uint16_t hf = (handle | (ACL_START_NO_FLUSH << 12));
-
-    aclbuf << uint16_t(sd.len);
-    aclbuf << uint16_t(cid);
-    aclbuf.append(sd.data, sd.len);
-    int len = aclbuf.length();
-    int chunkid = 0;
-    
-#ifdef DEBUG    
-    bybuff  xtrace(aclbuf.buffer(), aclbuf.length());
-    TRACE("{\nALL===>Q{["<< int(xtrace.length()) <<"]}"<< xtrace.to_string());
-#endif 
-    
-    while(len > 0)
-    {
-        queu_acl_item* chunk = new queu_acl_item;
-        chunk->byarr << uint8_t(HCI_ACLDATA_PKT);
-        chunk->byarr << uint16_t(hf);
-        chunk->byarr << uint16_t(aclbuf.getcount(this->_aclMtu));
-        len = aclbuf.transfer(chunk->byarr, this->_aclMtu);
-        chunk->cid = cid;
-        chunk->handle = handle;
-        chunk->sequence = chunkid++;
-        TRACE("{\n----->Q["<<int(chunkid)<<","<<int(handle)<<"]"<< int(chunk->byarr.length()) <<"]"<< chunk->byarr.to_string());
-        _aclOutQueue.push_back(chunk);
-        _drain_out_queue();
-         hf |= (ACL_CONT << 12);
-    }	
-}
-void  bu_hci::_drain_out_queue()
-{
-    if(_aclPendingHandlers.size() || _aclOutQueue.size())
-    {
-        TRACE(__FUNCTION__);
-        TRACE("PENDING HNDLS:" << _aclPendingHandlers.size());
-        
-        int sending=0;
-        for (auto& a : _aclPendingHandlers) 
-            sending+=a.second;
-            
-        while (sending < _aclPendingMax && _aclOutQueue.size())
-        {
-            ++sending;
-            write_acl_chunk();
-        }
-    }
-}
-
-void bu_hci::write_acl_chunk()
-{
-    if(_aclOutQueue.size())
-    {
-        TRACE(__FUNCTION__);
-        const queu_acl_item* chunk = _aclOutQueue.at(0);
-        const bybuff&        byr = chunk->byarr;
-        
-        TRACE("{\n<-----Q["<< int(byr.length()) <<","<<int(chunk->handle)<<","<<int(chunk->sequence)<<"]"<< byr.to_string());
-        _aclPendingHandlers[chunk->handle]++;
-        _write_sock((const uint8_t*)byr.buffer(), byr.length());
-        
-        TRACE("DELETE QUE: " << int(chunk->handle));
-        
-        delete chunk;
-        _aclOutQueue.erase(_aclOutQueue.begin());
-    }		
+    _socket->pool(msecs, callmain);
 }
 
 
@@ -1232,21 +1095,155 @@ void bu_hci::write_acl_chunk()
 void bu_hci::_reconfigure()
 {
     TRACE(__FUNCTION__);
-    
     this->_clear();
-    	this->_set_hci_filter();
-    	_spinpool(-1, false);
-    	this->_set_event_mask();
-    	_spinpool(-1, false);
-    	this->_set_le_event_mask();
-    	_spinpool(-1, false);
-    	this->_read_version();
-    	_spinpool(-1, false);
-    	this->_write_le_host();
-    	_spinpool(-1, false);
-    	this->_read_le_hosts();
-    	_spinpool(-1, false);
-    	this->_read_baddr();
-    	_spinpool(-1, false);
 
+    this->_set_hci_filter();
+    _poolsocket(100, false);
+    this->_set_event_mask();
+    _poolsocket(100, false);
+    this->_set_le_event_mask();
+    _poolsocket(100, false);
+    this->_write_le_host();
+    _poolsocket(100, false);
+    this->_read_version();
+    _poolsocket(100, false);
+    this->_read_le_hosts();
+    _poolsocket(100, false);
+    this->_read_baddr();
+    _poolsocket(100, false);
+    this->_le_read_buffer_size();
+    _poolsocket(100, false);
+}
+
+void bu_hci::enque_acl(uint16_t handle, uint16_t cid, const sdata& sd)
+{
+    TRACE("::"<<__FUNCTION__);
+
+    bybuff   aclbuf;
+    uint16_t hf = (handle | (ACL_START_NO_FLUSH << 12));
+
+#ifdef DEBUG
+    bybuff tr(sd.data, sd.len);
+    TRACE("toQ: handle:" << int(handle) << ", cid: " << int(cid));
+    TRACE("toQ: [" <<int(tr.length())<<"]" << tr.to_string());
+#endif // DEBUG
+
+    aclbuf << uint16_t(sd.len);
+    aclbuf << uint16_t(cid);
+    aclbuf.append(sd.data, sd.len);
+    
+    int mtu = int(this->_aclMtu);
+    int len = int(aclbuf.length());
+    int accum = 0;
+    const uint8_t* paclbuff = aclbuf.buffer();
+
+    while(len > 0)
+    {
+        AclChunk a;
+        int      tocpy = std::min(mtu, len);
+        
+        a.acl.aclpkt  = uint8_t(HCI_ACLDATA_PKT);
+        a.acl.aclhndl = btohs((uint16_t(hf)));
+        a.acl.length  = btohs((uint16_t(tocpy)));
+        hf |= (ACL_CONT << 12);
+        
+        a.aclsz  = 5 + tocpy;
+        ::memcpy(a.acl.buff, paclbuff + accum, tocpy);
+        accum += tocpy;
+        len -= tocpy;
+        std::deque<AclChunk>& r = _aclOut[handle];
+        r.push_back(a);
+        
+        TRACE("Adding hander " << int(handle));
+    }
+
+    TRACE("\nin Q: [" <<int(aclbuf.length())<<"]" << aclbuf.to_string());
+    TRACE("Queue: " << _aclOut.size() << " of "<<_aclOut[handle].size() << " chunks");
+    flush_acl();
+}
+
+void bu_hci::flush_acl()
+{
+    int handlers = 0;
+    for(const auto& hip : _aclPending)
+        handlers += hip.second;
+    while(handlers < this->_aclPendingMax && _aclOut.size())
+    {
+        ++handlers;
+        write_acl_chunk(_aclOut.begin()->first);
+    }
+}
+
+extern int Delay;
+void bu_hci::write_acl_chunk(uint16_t handle)
+{
+    TRACE("::"<<__FUNCTION__);
+    std::deque<AclChunk>& dq = _aclOut[handle];
+    if(dq.size())
+    {
+        TRACE("Write chunk[" << int(handle) <<"] delay:" << Delay);
+
+        if(_aclPending.find(handle) == _aclPending.end())
+            _aclPending[handle]=0;
+        _aclPending[handle]++;
+
+        AclChunk& ak = dq.front();
+        ::usleep(Delay);
+        _write_sock(ak.acl, ak.aclsz);
+        ::usleep(Delay);
+        dq.pop_front();
+        TRACE("Left chunks[" << int(handle) <<"]=" << dq.size() );
+        if(dq.size()==0)
+            _aclOut.erase(handle);
+    }
+}
+
+void bu_hci::_erase_AclOut(uint16_t handle)
+{
+    std::map<uint16_t, std::deque<AclChunk> >::iterator a = _aclOut.find(handle);
+    if(a != _aclOut.end())
+    {
+        TRACE("erasing acl chunks:" << int(handle));
+        _aclOut.erase(handle);
+        TRACE("pending handlers:" << _aclOut.size());
+    }
+
+    std::map<uint16_t, int>::iterator it = this->_aclPending.find(handle);
+    if(it != this->_aclPending.end())
+    {
+        TRACE("erasing pending handler " << int(handle));
+        this->_aclPending.erase(it);
+    }
+}
+
+/****************************************************************************************
+*/
+void bu_hci::write_ack_packet(uint16_t handle, uint16_t cid, const sdata& data)
+{
+    _TRACE(__FUNCTION__);
+    struct  _PAACK8
+    {
+        struct  _PAACK8
+        {
+            uint8_t a;
+            uint16_t b;
+            uint16_t c;
+            uint16_t len;
+            uint16_t cid;
+        } hdr;
+        uint8_t  pck[512]; /*enough well see*/
+    }
+    cmd={
+            {
+                (uint8_t)HCI_ACLDATA_PKT,
+                (uint16_t)(btohs((uint16_t)(handle | (ACL_START_NO_FLUSH << 12)))),
+                (uint16_t)(data.len + 4),
+                (uint16_t)(btohs((uint16_t)(data.len))),
+                (uint16_t)(btohs(cid)),
+            },
+        {0}
+    };
+    assert(data.len < 512);
+    ::memcpy(cmd.pck, data.data, data.len);
+    _write_sock(cmd, data.len + sizeof(cmd.hdr));
 }

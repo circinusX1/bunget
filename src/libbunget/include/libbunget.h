@@ -229,7 +229,7 @@ public:
     virtual void onIndicate(IHandler* pc)=0;
     virtual void onAdvertized(bool onoff)=0;
     virtual void onDeviceStatus(bool onoff)=0;
-    virtual void onConnect(const HciDev* device)=0;
+    virtual void onStatus(const HciDev* device)=0;
 };
 
 class BtCtx

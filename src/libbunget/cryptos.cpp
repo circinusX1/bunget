@@ -110,7 +110,7 @@ void cryptos::_sha_encrypt(const bybuff& key, const bybuff& data, bybuff& out)
         stfEncryptor.Put( data.buffer(), (size_t)data.length() );
         stfEncryptor.MessageEnd();
         out = encoded;
-        TRACE("_sha_e(" << key.to_string() <<","<< data.to_string() <<")=" << out.to_string());
+        _TRACE("_sha_e(" << key.to_string() <<","<< data.to_string() <<")=" << out.to_string());
         bybuff r;
         _sha_decrypt(key, out, r);
 #endif //0

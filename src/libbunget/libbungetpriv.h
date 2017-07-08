@@ -173,6 +173,7 @@ private:
     S_STATE     _status;
     int         _respdelay;
     int         _advinterval;
+    int         _maxMtu;
     std::vector<hci_data_eater*> _eaters;
     std::vector<IService*>      _services;
 };

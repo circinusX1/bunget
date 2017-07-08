@@ -33,6 +33,7 @@
 #else
 #   define TRACE(x)
 #endif //
+#   define _TRACE(x)
 #define ERROR(x)    std::cout <<"E:"<< x << " \n"
 
 #ifdef __cplusplus

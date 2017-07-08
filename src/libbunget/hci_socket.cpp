@@ -129,25 +129,19 @@ int hci_socket_ble::bind_raw(int* devId)
     {
         ::memcpy(_address, &di.bdaddr, sizeof(di.bdaddr));
         _addressType = int(di.type);
-        if (_addressType == 3)
-        {
+        if (_addressType == 3)//hack
             _addressType = 1;
-        }
-/*
-	if (hci_test_bit(HCI_INQUIRY, &di.flags))
-		_send_cmd(OCF_INQUIRY_CANCEL, OGF_LINK_CTL,0,0);
-	else
-		_send_cmd(OCF_EXIT_PERIODIC_INQUIRY, OGF_LINK_CTL,0,0);
-*/
-
+		
+		if (hci_test_bit(HCI_INQUIRY, &di.flags))
+			_send_cmd(OCF_INQUIRY_CANCEL, OGF_LINK_CTL,0,0);
+		else
+			_send_cmd(OCF_EXIT_PERIODIC_INQUIRY, OGF_LINK_CTL,0,0);
     }
     return this->_devId;
 }
 
 void hci_socket_ble::_send_cmd(uint16_t ocf, uint16_t ogf, uint8_t plen, void *param)
 {
-    TRACE(__FUNCTION__);
-	TRACE("                 stop inquire me!!!!!!!!!!!");
     uint8_t loco[512];
     hci_command_hdr hc;
 
@@ -157,7 +151,6 @@ void hci_socket_ble::_send_cmd(uint16_t ocf, uint16_t ogf, uint8_t plen, void *p
     memcpy(loco, &hc, sizeof(hc));
     if(plen)
         memcpy(loco+sizeof(hc), param, plen);
-
     writeocts(loco, plen+sizeof(hc));
 }
 
@@ -281,19 +274,20 @@ int hci_socket_ble::_resolve_devid(int* pDevId, bool isUp)
 
 /****************************************************************************************
 */
-bool hci_socket_ble::pool(bool callhci)
+bool hci_socket_ble::pool(int ttp, bool callhci)
 {
     fd_set          read;
     struct timeval  to;
-    int tout=10; //10ms
+    int             tout = ttp==-1 ? 16 : ttp;
 
     FD_ZERO (&read);
     FD_SET (_sock, &read);
 
-	while(--tout>0){
+    while(--tout>0)
+    {
 		to.tv_sec = 0;
-		to.tv_usec = 1000;
-		int rv = ::select(_sock+1,&read,0,0,&to);
+        to.tv_usec = 1024; // 1 milliseeond, ttp times
+        int rv = ::select(_sock+1, &read, 0, 0, &to);
 		if(rv < 0)
 		{
 			hci_error e;
@@ -306,7 +300,7 @@ bool hci_socket_ble::pool(bool callhci)
 		{
 			if(_bytes)
 				break;
-			::usleep(32);
+            ::usleep(128);
 		}
 		if(FD_ISSET(_sock, &read))
 		{
@@ -319,7 +313,7 @@ bool hci_socket_ble::pool(bool callhci)
 				e.nerror = errno;
 				e.message="netdown";
 				_hci->on_error(e);
-				TRACE("socket error ...........");
+                TRACE("socket error ...........");
 				break;
 			}
 		}
@@ -329,7 +323,6 @@ bool hci_socket_ble::pool(bool callhci)
 		_notify_read();
 	if(callhci)
 		_hci->onSpin(this);
-
     return true;
 }
 
@@ -356,7 +349,7 @@ void hci_socket_ble::_tweakHciKernel(int length, uint8_t* data)
             data[3] == 0x01 &&
             data[4] == 0x00)
         {
-            TRACE(__FUNCTION__);
+            _TRACE(__FUNCTION__);
             int l2socket;
             struct sockaddr_l2 l2a;
             unsigned short l2cid;

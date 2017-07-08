@@ -46,9 +46,9 @@ SrvDevice::SrvDevice(ISrvProc* proc, int& hcid, const char* name, int delay):_cb
     _advstatus = 0;
     _defaults = false;
     _status = eOFFLINE;
-
-    if(_respdelay > 100 || _respdelay< 0)
-        delay = 100; // nomore than 100 ms
+    _maxMtu = 23;
+    if(_respdelay > 128 || _respdelay< 0)
+        delay = 128; // nomore than 100 ms
 }
 
 /****************************************************************************************
@@ -148,8 +148,8 @@ int     SrvDevice::advertise(bool onoff)
             }
             _gapp =  new bu_gap(_hci);
             _gatt= new bu_gatt(_hci);
-            _gatt->setMaxMtu(23);
-	    _gapp->advertise(_name.c_str(), _services, _pin);
+            _gatt->setMaxMtu(_maxMtu);
+            _gapp->advertise(_name.c_str(), _services, _pin);
         }
     }
     else
@@ -204,7 +204,7 @@ int SrvDevice::adv_beacon(const char* suid, uint16_t minor,
 
     Cguid cuid = Cguid::from_string(suid);
 
-    TRACE(cuid.to_string());
+    _TRACE(cuid.to_string());
 
     if(0==_hci)
     {
@@ -309,11 +309,13 @@ void SrvDevice::on_read_version(uint8_t hciver, uint16_t hcirev, uint8_t lmpver,
     _lmpver=lmpver;
     _man=man;
     _lmpsubver=lmpsubver;
-    if (_man == 2) {  // INTEL
-        if(_gatt)_gatt->setMaxMtu(23);
-    }
-    else if (_man == 93){// RALTEK
-        if(_gatt)_gatt->setMaxMtu(23);
+    if (_man == 2 || _man == 93)
+    {      // INTEL,REALTEK
+        _maxMtu =  23;
+        if(_gatt)
+            _gatt->setMaxMtu(23);
+        else
+            _maxMtu = 23;
     }
 }
 
@@ -335,7 +337,7 @@ void SrvDevice::on_mac_change(const bdaddr_t& addr)
 */
 void SrvDevice::on_adv_status(HCI_STATE status)
 {
-    TRACE("on_adv_status = " << int(status));
+    _TRACE("on_adv_status = " << int(status));
     _hcistatus = status; //STATE_POWEREDOFF
 }
 
@@ -343,7 +345,7 @@ void SrvDevice::on_adv_status(HCI_STATE status)
 */
 void SrvDevice::on_adv_data_status(uint8_t status)
 {
-    TRACE("on_adv_data_status = " << int(status));
+    _TRACE("on_adv_data_status = " << int(status));
     _advstatus = status;
 }
 
@@ -351,7 +353,7 @@ void SrvDevice::on_adv_data_status(uint8_t status)
 */
 void SrvDevice::on_scan_resp_datat_status(uint8_t status)
 {
-    TRACE("on_scan_resp_datat_status = " << int(status));
+    _TRACE("on_scan_resp_datat_status = " << int(status));
     _scanrespdatastatus = int(status);
 }
 
@@ -359,7 +361,7 @@ void SrvDevice::on_scan_resp_datat_status(uint8_t status)
 */
 void SrvDevice::on_adv_enable(uint8_t status)
 {
-    TRACE("on_adv_enable = " << int(status));
+    _TRACE("on_adv_enable = " << int(status));
     _advstatus = status;
 }
 
@@ -413,11 +415,10 @@ void SrvDevice::on_disconnect(const evt_disconn_complete* evdc)
     }
 
     _gatt->reset();
-    delete _pacl;
-    _pacl = 0;
+    delete _pacl;  _pacl = 0;
     this->data_unsubscribe(_gatt);
     _gapp->restart_adv();
-    _cb_proc->onConnect(0);
+    _cb_proc->onStatus(0);
     _eaters.clear();
 }
 
@@ -453,7 +454,7 @@ void SrvDevice::on_le_connected(uint8_t status, uint16_t handle, uint8_t role,
     _remote._mac = bas;
     _remote._name = "*";
     _remote._props = addressType;
-    _cb_proc->onConnect(&_remote);
+    _cb_proc->onStatus(&_remote);
 }
 
 

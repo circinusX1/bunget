@@ -14,8 +14,7 @@
 #define NO_HCI_H
 
 #include <iostream>
-#include <vector>
-//#include "os.h"
+#include <deque>
 #include "include/hci.h"
 #include "hci_socket.h"
 #include "bybuff.h"
@@ -96,15 +95,6 @@ typedef struct{
 	uint16_t handler;
 	uint16_t packet;
 }__attribute__ ((packed)) no_acl_handler_packet;
-
-
-typedef struct{
-	uint16_t handle;
-	uint16_t cid;
-	uint16_t sequence;
-	bybuff   byarr;
-}  queu_acl_item;
-
 
 typedef struct  {
 	uint8_t  evt;
@@ -193,6 +183,20 @@ public:
 };
 
 
+struct AclChunk
+{
+    struct _PAACK8 Acl
+    {
+        uint8_t     aclpkt;
+        uint16_t    aclhndl;
+        uint16_t    length;
+        uint8_t     buff[256];
+    }           acl;
+    int         aclsz;
+    AclChunk(){}
+    AclChunk(const AclChunk& a){::memcpy(this, &a, sizeof(*this));}
+    AclChunk& operator=(const AclChunk& a){::memcpy(this, &a, sizeof(*this)); return *this;}
+};
 
 /******************************************************************************
 */
@@ -222,13 +226,13 @@ public:
     int read_local_name();
     void write_local_name(const char* name);
     void enque_acl(uint16_t handle, uint16_t cid, const sdata& sd);
-    void write_acl_chunk();
+    void write_acl_chunk(uint16_t handle);
+    void flush_acl();
     virtual void on_error(const hci_error& error);
     virtual bool onSpin(bt_socket* sock);
     virtual int on_sock_data(uint8_t code, const sdata& buffer);
 
 protected:
-    void _drain_out_queue();
     void _le_read_buffer_size();
     void _read_buffer_size();
     int  _on_hci_data(uint8_t code, const sdata& buffer);
@@ -238,7 +242,7 @@ protected:
     void _onle_complette(const no_evt_le_meta_event* neleme);
     void _onle_con_update_complette(const no_evt_le_meta_event* neleme);
     void _reconfigure();
-    void _spinpool(int lops=8, int callmain=true);
+    void _poolsocket(int lops=8, int callmain=true);
     void _set_hci_filter();
     void _set_event_mask();
     void _set_le_event_mask();
@@ -263,7 +267,7 @@ protected:
     }
     void _clear();
     bool _recreate_sock();
-
+    void _erase_AclOut(uint16_t handle);
 private:
     int                 _devid;
     SrvDevice*          _pev;
@@ -278,9 +282,8 @@ private:
     int                  _delay;
     uint16_t            _aclMtu;
     uint16_t            _aclPendingMax;
-    std::vector<queu_acl_item*> _aclOutQueue;
-    std::map<uint16_t,no_acl_start_len_dynamic*> _aclInQueue;
-    std::map<uint16_t, uint16_t> _aclPendingHandlers;	
-    bool                _usebuffessz;
+    std::map<uint16_t, std::deque<AclChunk> > _aclOut;
+    std::map<uint16_t, int>      _aclPending;
+    std::map<uint16_t, no_acl_start_len_dynamic*> _aclIn;
 };
 #endif // NO_HCI_H

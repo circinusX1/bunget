@@ -28,7 +28,7 @@
         0x3402
 
 */
-
+// #define XECHO
 #include <fstream>
 #include <iostream>
 #include <unistd.h>
@@ -84,7 +84,7 @@ public:
     void onWriteDescriptor(IHandler* pc, IHandler* pd);
     void onAdvertized(bool onoff);
     void onDeviceStatus(bool onoff);
-    void onConnect(const HciDev* connected);
+    void onStatus(const HciDev* connected);
     bool onSpin(IServer* ps);
 
 private:
@@ -111,6 +111,7 @@ public:
 
 /****************************************************************************************
 */
+int Delay = 0;
 int main(int n, char* v[])
 {
     if(n==1)
@@ -119,33 +120,26 @@ int main(int n, char* v[])
         return -1;
     }
 
-
     BtCtx*      ctx = BtCtx::instance();
     my_proc     procedure;
     int dev = ::atoi(v[1]);
 
-    std::cout << "Version 1.0.0 March 9 2017 \n";
+    if(n == 3)
+        Delay = ::atoi(v[2]);
+
+    std::cout << "Version 1.0.1 June 30 2017 \n";
     try{
-#ifndef XECHO
-        IServer*    BS =  ctx->new_server(&procedure, dev, "bunget", 64);
-#else        
-        IServer*    BS =  ctx->new_server(&procedure, dev, "echo", 10);
-#endif //        
+        IServer*    BS =  ctx->new_server(&procedure, dev, "bunget", 80);
         //BS->set_name("advname"); // this is the bt name.
 
-        if(n==3 && v[2][0]=='b') //beacon mode
+        if(n==3 && v[2][0]=='b') //beacon mode (not tested)
         {
             //99999999-9999-9999-9999-999999999999
             BS->adv_beacon("11111111-1111-1111-1111-111111111111", 1, 10, -10, 0x004C, (const uint8_t*)"MARIUS", 7);
         }
         else
         {
-#ifdef XECHO
-            IService*   ps = BS->add_service(0x123F,"echo");
-            procedure.LedChr = ps->add_charact(UID_GPIO,PROPERTY_WRITE|PROPERTY_INDICATE|PROPERTY_NOTIFY,
-                                     0,
-                                     FORMAT_RAW, 1); // 1 / 0
-#else
+
             IService*   ps = BS->add_service(0x123F,"bunget");
             procedure.LedChr = ps->add_charact(UID_GPIO,PROPERTY_WRITE|PROPERTY_INDICATE|PROPERTY_NOTIFY,
                                      0,
@@ -158,7 +152,6 @@ int main(int n, char* v[])
             procedure.Temp1Chr = ps->add_charact(UID_TEMP, PROPERTY_NOTIFY|PROPERTY_INDICATE,
                                       0,
                                       FORMAT_FLOAT, FORMAT_FLOAT_LEN); // we send it as float
-#endif //                                      
             BS->advertise(true);
         }
 
@@ -196,22 +189,32 @@ bool my_proc::initHciDevice(int devid, const char* devn)
     // system("rfkill unblock bluetooth");
     ::sprintf(name,"hciconfig hci%d down", devid);
     system(name);
-    ::usleep(100000);
+    ::sleep(2);
     ::sprintf(name,"hciconfig hci%d up", devid);
     system(name);
-    system("hciconfig hci0 sspmode 0");
-    system("hciconfig hci0 nosecmgr");
-    system("hciconfig hci0 noencrypt");
-    system("hciconfig hci0 noauth");
-    system("hciconfig hci0 noleadv");
-    system("hciconfig hci0 noscan");
-
+/*
+    ::sprintf(name,"hciconfig hci%d sspmode 0", devid);
+    system(name);
+    ::sprintf(name,"hciconfig hci%d nosecmgr", devid);
+    system(name);
+    ::sprintf(name,"hciconfig hci%d noencrypt", devid);
+    system(name);
+*/ 
+    ::sprintf(name,"hciconfig hci%d noauth", devid);
+    system(name);
+    ::sprintf(name,"hciconfig hci%d noleadv", devid);
+    system(name);
+    ::sprintf(name,"hciconfig hci%d noscan", devid);
+    system(name);
     ::sprintf(name,"hciconfig hci%d name  %s", devid, devn);
     system(name);
+/*
     ::sprintf(name,"hciconfig hci%d piscan", devid);
     system(name);
     ::sprintf(name,"hciconfig hci%d leadv", devid);
     system(name);
+*/
+
     printf("%s", "done dirty work\n");
     
     return true;
@@ -335,16 +338,16 @@ void my_proc::onDeviceStatus(bool onoff)
 
 /****************************************************************************************
 */
-void my_proc::onConnect(const HciDev* device)
+void my_proc::onStatus(const HciDev* device)
 {
     if(device == 0)
     {
         _subscribed = false;
-        TRACE("my_proc event: onConnect: disconnected");
+        TRACE("my_proc event: onStatus: disconnected");
     }
     else
     {
-        TRACE("accepted: " << device->_mac <<","<< device->_name);
+        TRACE("accepted connection: " << device->_mac <<","<< device->_name);
     }
 }
 
@@ -441,12 +444,14 @@ void my_proc::_send_value(IHandler* pc)
         case  UID_TEMP:
             {
                 float ft = _get_temp();
-                pc->put_value((uint8_t*)&ft,sizeof(float));
-                //const char* fts = _get_temp_s();
-                //pc->put_value((uint8_t*)fts,::strlen(fts));
+                //pc->put_value((uint8_t*)&ft,sizeof(float));
+                const char* fts = _get_temp_s();
+                pc->put_value((uint8_t*)fts,::strlen(fts));
             }
             break;
         default:
             break;
     }
 }
+
+
