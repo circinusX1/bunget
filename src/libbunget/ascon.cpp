@@ -13,17 +13,16 @@
 #include "bu_hci.h"
 #include "ascon.h"
 #include "libbungetpriv.h"
-using namespace bunget;
 
 /****************************************************************************************
 */
-bu_asc::bu_asc(bu_hci* hci, uint16_t handle,
+bu_asc::bu_asc(Icryptos* pcrypt, bu_hci* hci, uint16_t handle,
                             const bdaddr_t& l,
                             int ltyp,
                             const bdaddr_t& r,
                             int rtyp):_handle(handle),_hci(hci)
 {
-    _secman = new secmanp(this, hci, l, ltyp, r, rtyp);
+    _secman = new secmanp(pcrypt, this, hci, l, ltyp, r, rtyp);
 }
 
 /****************************************************************************************
@@ -40,7 +39,7 @@ void bu_asc::write(uint16_t cid, const bybuff& data)
     sdata sd;
     sd.data = data.buffer();
     sd.len = uint16_t(data.length());
-#ifdef ONGOING
+#ifdef ACL_MTU_FRAG
     _hci->enque_acl(_handle, cid, sd);
 #else
     _hci->write_ack_packet(_handle, cid, sd);

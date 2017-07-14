@@ -19,8 +19,8 @@
 #include "gattdefs.h"
 #include "bu_hci.h"
 #include "include/libbunget.h"
+#include "include/icryptos.h"
 
-using namespace bunget;
 
 /******************************************************************************
 */
@@ -39,16 +39,15 @@ enum {
     INTERN_SUBSCRIBED = 0x1,
 };
 
-
-
 /******************************************************************************
 */
+
 class SrvDevice : public IServer, public hci_event
 {
 public:
     SrvDevice(ISrvProc* proc, int& hcid, const char* name, int delay=0);
     ~SrvDevice();
-    void    power_switch(bool on);
+    void   power_switch(bool on);
     int    advertise(bool onoff);
     IService* add_service(uint16_t srvid, const char* name);
     IService* add_service(const bt_uuid_t& srvid, const char* name);
@@ -150,6 +149,7 @@ private:
     bu_gap*      _gapp;
     bu_gatt*     _gatt;
     bu_hci*      _hci;
+    Icryptos*   _pcrypt;
     int         _hcidev;
     std::string _name;
     int         _pin;
@@ -189,7 +189,6 @@ public:
             delete a.second;
 
     }
-
     virtual IServer* new_server(ISrvProc* proc, int hcidev, const char* name, int tweak_delay=0);
  private:
     std::map<int,IServer*> _adapters;

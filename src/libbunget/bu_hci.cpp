@@ -89,7 +89,7 @@ void bu_hci::_set_hci_filter()
     }  filter =
     {
         btohl((1 << HCI_EVENT_PKT)| (1 << HCI_ACLDATA_PKT)),
-#ifdef ONGOING
+#ifdef ACL_MTU_FRAG
         btohl( (1 << EVT_NUM_COMP_PKTS)|
                (1 << EVT_DISCONN_COMPLETE) |
                (1 << EVT_ENCRYPT_CHANGE) |
@@ -556,9 +556,9 @@ int bu_hci::on_sock_data(uint8_t code, const sdata& buffer) //received
                     evt_disconn_complete* pdc = (evt_disconn_complete*)(buffer.data+4);
                     pdc->handle = htobs(pdc->handle);
                     memcpy(&_dcached, pdc, sizeof(_dcached));
-#ifdef ONGOING
+#ifdef ACL_MTU_FRAG
                     flush_acl();
-#endif //ONGOING
+#endif //ACL_MTU_FRAG
                     _clear();
                     _pev->on_disconnect(pdc);
                     _connected=false;
@@ -621,7 +621,7 @@ int bu_hci::on_sock_data(uint8_t code, const sdata& buffer) //received
                     TRACE("remote name: " << pnc->name);
                 }
                 break;
-#ifdef ONGOING
+#ifdef ACL_MTU_FRAG
         case EVT_NUM_COMP_PKTS:
                 scase="EVT_NUM_COMP_PKTS";
                 {
@@ -654,7 +654,7 @@ int bu_hci::on_sock_data(uint8_t code, const sdata& buffer) //received
                     this->flush_acl();
         }
         break;
-#endif //ONGOING
+#endif //ACL_MTU_FRAG
             default:
                 break;
         }//switch
@@ -1174,23 +1174,18 @@ void bu_hci::flush_acl()
     }
 }
 
-extern int Delay;
 void bu_hci::write_acl_chunk(uint16_t handle)
 {
     TRACE("::"<<__FUNCTION__);
     std::deque<AclChunk>& dq = _aclOut[handle];
     if(dq.size())
     {
-        TRACE("Write chunk[" << int(handle) <<"] delay:" << Delay);
-
         if(_aclPending.find(handle) == _aclPending.end())
             _aclPending[handle]=0;
         _aclPending[handle]++;
 
         AclChunk& ak = dq.front();
-        ::usleep(Delay);
         _write_sock(ak.acl, ak.aclsz);
-        ::usleep(Delay);
         dq.pop_front();
         TRACE("Left chunks[" << int(handle) <<"]=" << dq.size() );
         if(dq.size()==0)

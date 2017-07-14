@@ -138,8 +138,6 @@ int bu_gatt::on_sock_data(uint8_t code, const sdata& data)
     bybuff  ret;
     bybuff   trace(data.data,data.len);
 
-    std::cout << "REQ:  ----------> " <<type2string(rqt) << "\n";
-
     switch(rqt)
     {
         case ATT_OP_MTU_REQ://2

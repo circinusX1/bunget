@@ -10,11 +10,11 @@
     <File Name="../src/libbunget/libbungetpriv.cpp"/>
     <File Name="../src/libbunget/bu_gatt.h"/>
     <File Name="../src/libbunget/ascon.h"/>
-    <File Name="../src/libbunget/libbunget.depend"/>
+    <File Name="../src/libbunget/libbunget.depend" ExcludeProjConfig="Debug"/>
     <File Name="../src/libbunget/hci_socket.cpp"/>
     <File Name="../src/libbunget/hci_socket.h"/>
     <File Name="../src/libbunget/bu_gatt.cpp"/>
-    <File Name="../src/libbunget/libbunget.cbp"/>
+    <File Name="../src/libbunget/libbunget.cbp" ExcludeProjConfig="Debug"/>
     <File Name="../src/libbunget/rfcomm_socket.h"/>
     <File Name="../src/libbunget/sco_socket.cpp"/>
     <File Name="../src/libbunget/sco_socket.h"/>
@@ -28,10 +28,8 @@
     <File Name="../src/libbunget/bt_socket.cpp"/>
     <File Name="../src/libbunget/l2cap_socket.cpp"/>
     <File Name="../src/libbunget/rfcomm_socket.cpp"/>
-    <File Name="../src/libbunget/cryptos.cpp"/>
     <File Name="../src/libbunget/l2cap_socket.h"/>
     <File Name="../src/libbunget/bu_gap.h"/>
-    <File Name="../src/libbunget/cryptos.h"/>
     <File Name="../src/libbunget/lebiendians.h"/>
     <File Name="../src/libbunget/bu_gap.cpp"/>
     <File Name="../src/libbunget/bybuff.h"/>
@@ -41,6 +39,9 @@
     <File Name="../src/libbunget/secmanp.cpp"/>
     <File Name="../src/libbunget/hci_config.cpp"/>
     <File Name="../src/libbunget/bt_incinpl.cpp"/>
+    <File Name="../src/crypto.h"/>
+    <File Name="../src/crypto.cpp"/>
+    <File Name="../src/libbunget/include/libbunget.h"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>

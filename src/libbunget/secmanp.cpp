@@ -20,8 +20,8 @@
 
 /****************************************************************************************
 */
-secmanp::secmanp(bu_asc* acl, bu_hci*  hci, const bdaddr_t& local, int ltyp,
-                 const bdaddr_t& remote, int rtyp):_aclbuffer(acl),_hci(hci)
+secmanp::secmanp(Icryptos* pc, bu_asc* acl, bu_hci*  hci, const bdaddr_t& local, int ltyp,
+                 const bdaddr_t& remote, int rtyp):_crypt(pc), _aclbuffer(acl),_hci(hci)
 {
     bdaddr_t tmp;
 
@@ -145,8 +145,8 @@ void secmanp::_pairing_confirm(const bybuff& data)
     _pcnf = data;
     _tk << 0x00000000 << 0x00000000 << 0x00000000 << 0x00000000; //
     _r.reset();
-    _crypt.gen_random(16, _r);
-    _crypt.c1(_tk, _r, _pres, _preq, _iat, _ia, _rat, _ra, is_encrypted);
+    _crypt->gen_random(16, _r);
+    _crypt->c1(_tk, _r, _pres, _preq, _iat, _ia, _rat, _ra, is_encrypted);
     bybuff  stream;
     stream << uint8_t(SMP_PAIRING_CONFIRM) << is_encrypted;
     write(stream);
@@ -160,7 +160,7 @@ void secmanp::_pairing_random(const bybuff& data)
     bybuff  is_encrypted;
     bybuff  pncf,tosend;
 
-    _crypt.c1(_tk, r, _pres, _preq, _iat, _ia, _rat,_ra,is_encrypted);
+    _crypt->c1(_tk, r, _pres, _preq, _iat, _ia, _rat,_ra,is_encrypted);
     pncf << uint8_t(SMP_PAIRING_CONFIRM) << is_encrypted;
     if(pncf ==_pncf)
     {
@@ -169,7 +169,7 @@ void secmanp::_pairing_random(const bybuff& data)
         _stk.reset();
         _mangaler << uint16_t(0x0000);
         _random  << 0x00000000 << 0x00000000;
-        _crypt.s1(_tk, _r, r, _stk);
+        _crypt->s1(_tk, _r, r, _stk);
         tosend << uint8_t(SMP_PAIRING_RANDOM) << _r;
     }
     else

@@ -20,7 +20,6 @@
 #include "include/libbunget.h"
 
 using namespace bunget;
-
 #define USE_FIXED_PIN_FOR_PAIRING		(0x0)
 #define DONOT_USE_FIXED_PIN_FOR_PAIRING	(0x01)
 #define MITM_PROTECTION_NOT_REQUIRED	(0x00)

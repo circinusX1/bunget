@@ -18,11 +18,11 @@
 #include "secmanp.h"
 #include "bu_hci.h"
 #include "bybuff.h"
-
+using namespace bunget;
 class bu_asc
 {
 public:
-    bu_asc(bu_hci* hci, uint16_t handle, const bdaddr_t& local, int ltyp,  const bdaddr_t& remote, int rtyp);
+    bu_asc(Icryptos* pcrypt, bu_hci* hci, uint16_t handle, const bdaddr_t& local, int ltyp,  const bdaddr_t& remote, int rtyp);
     virtual ~bu_asc();
     void write(uint16_t cid, const bybuff& buffer);
     void push(uint16_t cid, const sdata& buffer);

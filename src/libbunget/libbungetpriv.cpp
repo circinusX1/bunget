@@ -18,11 +18,8 @@
 #include "bu_gatt.h"
 #include "hci_config.h"
 
-using namespace bunget;
-
 extern bool     __alive;
 ContextImpl*    Ctx;
-
 
 /****************************************************************************************
 */
@@ -47,6 +44,7 @@ SrvDevice::SrvDevice(ISrvProc* proc, int& hcid, const char* name, int delay):_cb
     _defaults = false;
     _status = eOFFLINE;
     _maxMtu = 23;
+    _pcrypt = _cb_proc->get_crypto();
     if(_respdelay > 128 || _respdelay< 0)
         delay = 128; // nomore than 100 ms
 }
@@ -310,12 +308,10 @@ void SrvDevice::on_read_version(uint8_t hciver, uint16_t hcirev, uint8_t lmpver,
     _man=man;
     _lmpsubver=lmpsubver;
     if (_man == 2 || _man == 93)
-    {      // INTEL,REALTEK
+    {
         _maxMtu =  23;
         if(_gatt)
             _gatt->setMaxMtu(23);
-        else
-            _maxMtu = 23;
     }
 }
 
@@ -441,7 +437,8 @@ void SrvDevice::on_le_connected(uint8_t status, uint16_t handle, uint8_t role,
     {
         delete _pacl;
     }
-    _pacl = new bu_asc(_hci,
+    _pacl = new bu_asc(_pcrypt,
+                        _hci,
                         handle,
                        _hci->_address,
                        _hci->_addrtype,
@@ -563,7 +560,10 @@ BtCtx* BtCtx::instance()
 
 /****************************************************************************************
 */
-IServer* ContextImpl::new_server(ISrvProc* proc, int hcidev, const char* name, int tweak_delay)
+IServer* ContextImpl::new_server(ISrvProc* proc, 
+                                int hcidev, 
+                                const char* name, 
+                                int tweak_delay)
 {
     if(_adapters.find(hcidev) == _adapters.end())
     {
@@ -572,7 +572,6 @@ IServer* ContextImpl::new_server(ISrvProc* proc, int hcidev, const char* name, i
             delete p;
             return 0;
         }
-
         _adapters[hcidev] = p;
     }
     return  _adapters[hcidev];

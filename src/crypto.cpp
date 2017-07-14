@@ -4,16 +4,13 @@
     This program is distributed
     WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
-    This program, or portions of it cannot be used in commercial
-    products without the written consent of the author: marrius9876@gmail.com
-
 */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "cryptos.h"
+#include "crypto.h"
+#include "bybuff.h"
 #include <crypto++/osrng.h>
 #include <crypto++/modes.h>
 #include <crypto++/aes.h>
@@ -34,7 +31,7 @@ cryptos::~cryptos()
 
 /****************************************************************************************
 */
-void cryptos::gen_random(int ammount, bybuff&  dst)
+void cryptos::gen_random(int ammount, bybuff&  dst)const
 {
     for (int i=0;i<ammount;i++)
         dst <<  uint8_t(rand()%0xFF);
@@ -42,7 +39,7 @@ void cryptos::gen_random(int ammount, bybuff&  dst)
 
 /****************************************************************************************
 */
-void cryptos::_oxor(const bybuff& src1, const bybuff& src2, bybuff& dst)
+void cryptos::_oxor(const bybuff& src1, const bybuff& src2, bybuff& dst)const
 {
     dst.reset();
     for(size_t i=0;i<src1.length();i++){
@@ -55,7 +52,7 @@ void cryptos::_oxor(const bybuff& src1, const bybuff& src2, bybuff& dst)
 
 /****************************************************************************************
 */
-void cryptos::c1(bybuff& k, bybuff& r, bybuff& pres, bybuff& preq, bybuff& iat, bybuff& ia, bybuff& rat, bybuff& ra,  bybuff&  dst)
+void cryptos::c1(bybuff& k, bybuff& r, bybuff& pres, bybuff& preq, bybuff& iat, bybuff& ia, bybuff& rat, bybuff& ra,  bybuff&  dst)const
 {
     bybuff p1,p2;
 
@@ -73,7 +70,7 @@ void cryptos::c1(bybuff& k, bybuff& r, bybuff& pres, bybuff& preq, bybuff& iat, 
 
 /****************************************************************************************
 */
-void cryptos::s1(bybuff& tk, bybuff& r1, bybuff& r2, bybuff& stk)
+void cryptos::s1(bybuff& tk, bybuff& r1, bybuff& r2, bybuff& stk)const
 {
     bybuff  sr1(r1.buffer()+8,r1.length()-8);
     bybuff  sr2(r2.buffer()+8,r2.length()-8);
@@ -83,7 +80,7 @@ void cryptos::s1(bybuff& tk, bybuff& r1, bybuff& r2, bybuff& stk)
 
 /****************************************************************************************
 */
-void cryptos::_eee(bybuff& key, bybuff& data, bybuff& dst)
+void cryptos::_eee(bybuff& key, bybuff& data, bybuff& dst)const
 {
     key.reverse();
     data.reverse();
@@ -93,7 +90,7 @@ void cryptos::_eee(bybuff& key, bybuff& data, bybuff& dst)
 
 /****************************************************************************************
 */
-void cryptos::_sha_encrypt(const bybuff& key, const bybuff& data, bybuff& out)
+void cryptos::_sha_encrypt(const bybuff& key, const bybuff& data, bybuff& out)const
 {
 
     //Key and IV setup
@@ -141,7 +138,7 @@ void cryptos::_sha_encrypt(const bybuff& key, const bybuff& data, bybuff& out)
 
 /****************************************************************************************
 */
-void cryptos::_sha_decrypt(const bybuff& key, const bybuff& data, bybuff& out)
+void cryptos::_sha_decrypt(const bybuff& key, const bybuff& data, bybuff& out)const
 {
     std::string  decryptedtext;
     uint8_t iv[ CryptoPP::AES::BLOCKSIZE ] = {0};

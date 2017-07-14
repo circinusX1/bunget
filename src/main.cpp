@@ -4,10 +4,6 @@
     This program is distributed
     WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
-    This program, or portions of it cannot be used in commercial
-    products without the written consent of the author: zyraxes.comatgmaildotcom.
-
 */
 
 /*
@@ -22,6 +18,8 @@
     sudo mkdir /lib/firmware/brcm
     sudo mv fw-0a5c_21e8.hcd /lib/firmware/brcm/BCM20702A0-0a5c-21e8.hcd
 
+ *              THIS IS A DEMO FOR LIBBUNGET
+ * 
     This demo adds 1 service 0x123F with 3 characteristis.
         0x3400  control a GPIO pin, we connect a LED, on GPIO 17 '/sys/class/gpio/gpio17/value'
         0x3401
@@ -38,17 +36,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/select.h>
+#include <unistd.h>
+#include <sys/types.h>
 #include <termios.h>
 #include <stropts.h>
 #include <libbunget.h>
-
+#include "crypto.h"
 
 using namespace std;
-using namespace bunget;
 
 bool __alive = true;
 
 /****************************************************************************************
+ * intrerrupt the demo in a orthodox way
 */
 int _kbhit() {
     static const int STDIN = 0;
@@ -70,15 +70,17 @@ int _kbhit() {
 }
 
 /****************************************************************************************
+ * user procedure to intercept btle events  on****()
 */
 class my_proc : public ISrvProc
 {
 public:
     my_proc();
+    Icryptos* get_crypto(){return &_crypt;};
     bool initHciDevice(int devid, const char* name);
     void onServicesDiscovered(std::vector<IHandler*>& els);
     void onReadRequest(IHandler* pc);
-    int onSubscribesNotify(IHandler* pc, bool b);
+    int  onSubscribesNotify(IHandler* pc, bool b);
     void onIndicate(IHandler* pc);
     void onWriteRequest(IHandler* pc);
     void onWriteDescriptor(IHandler* pc, IHandler* pd);
@@ -101,6 +103,8 @@ public:
     IHandler*   LedChr;       // RW
     IHandler*   TimeChr;      // NIR
     IHandler*   Temp1Chr;     // NIR
+private:    
+    cryptos     _crypt;         // MANDATORY, detached form lib, Use it on your own GNU
 };
 
 /****************************************************************************************
@@ -110,50 +114,49 @@ public:
 #define UID_TEMP    0x3403
 
 /****************************************************************************************
+ * demo main program
 */
-int Delay = 0;
 int main(int n, char* v[])
 {
+    std::cout << LIBBUNGET_VERSION_STRING << "\n";
     if(n==1)
     {
-        std::cout << "bunget hcidev# <b>    [ b for beacon mode demo] \n";
+        std::cout << "sudo bunget hcidev#, pass device id as first argument!\n";
         return -1;
     }
-
-    BtCtx*      ctx = BtCtx::instance();
-    my_proc     procedure;
+    if(getuid()!=0)
+    {
+        std::cout << "sudo bunget hcidev#, run under sudo credentials!\n";
+        return -1;
+    }
+    
+    BtCtx*      ctx = BtCtx::instance();                // BT context
+    my_proc     procedure;                              // this procedure
     int dev = ::atoi(v[1]);
 
-    if(n == 3)
-        Delay = ::atoi(v[2]);
-
-    std::cout << "Version 1.0.1 June 30 2017 \n";
+    
     try{
-        IServer*    BS =  ctx->new_server(&procedure, dev, "bunget", 80);
+        IServer*    BS =  ctx->new_server(&procedure, dev, "bunget", 100);
+
+#if 0   // not tested !!!
         //BS->set_name("advname"); // this is the bt name.
+        //99999999-9999-9999-9999-999999999999
+        BS->adv_beacon("11111111-1111-1111-1111-111111111111", 1, 10, -10, 0x004C, (const uint8_t*)"todo", 7);
+#endif // 0
 
-        if(n==3 && v[2][0]=='b') //beacon mode (not tested)
-        {
-            //99999999-9999-9999-9999-999999999999
-            BS->adv_beacon("11111111-1111-1111-1111-111111111111", 1, 10, -10, 0x004C, (const uint8_t*)"MARIUS", 7);
-        }
-        else
-        {
+        IService*   ps = BS->add_service(0x123F,"bunget");
+        procedure.LedChr = ps->add_charact(UID_GPIO,PROPERTY_WRITE|PROPERTY_INDICATE|PROPERTY_NOTIFY,
+                                 0,
+                                 FORMAT_RAW, 1); // 1 / 0
 
-            IService*   ps = BS->add_service(0x123F,"bunget");
-            procedure.LedChr = ps->add_charact(UID_GPIO,PROPERTY_WRITE|PROPERTY_INDICATE|PROPERTY_NOTIFY,
-                                     0,
-                                     FORMAT_RAW, 1); // 1 / 0
+        procedure.TimeChr = ps->add_charact(UID_TIME, PROPERTY_READ|PROPERTY_NOTIFY,
+                                 0,
+                                 FORMAT_RAW, 20); // we send it as string
 
-            procedure.TimeChr = ps->add_charact(UID_TIME, PROPERTY_READ|PROPERTY_NOTIFY,
-                                     0,
-                                     FORMAT_RAW, 20); // we send it as string
-
-            procedure.Temp1Chr = ps->add_charact(UID_TEMP, PROPERTY_NOTIFY|PROPERTY_INDICATE,
-                                      0,
-                                      FORMAT_FLOAT, FORMAT_FLOAT_LEN); // we send it as float
-            BS->advertise(true);
-        }
+        procedure.Temp1Chr = ps->add_charact(UID_TEMP, PROPERTY_NOTIFY|PROPERTY_INDICATE,
+                                  0,
+                                  FORMAT_FLOAT, FORMAT_FLOAT_LEN); // we send it as float
+        BS->advertise(true);
 
         BS->run();
         BS->stop();
@@ -178,6 +181,7 @@ my_proc::my_proc()
 }
 
 /****************************************************************************************
+ * add your console hciconfig preambul to setup hci before BTLE is starting
 */
 bool my_proc::initHciDevice(int devid, const char* devn)
 {

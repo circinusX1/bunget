@@ -15,9 +15,9 @@
 
 #include "hci_socket.h"
 #include "bybuff.h"
-#include "cryptos.h"
+#include "icryptos.h"
 #include "bu_hci.h"
-
+using namespace bunget;
 
 #define XADDR_PUBLIC  0
 #define XADDR_RANDOM  1
@@ -27,7 +27,7 @@ class bu_asc;
 class secmanp : public hci_data_eater
 {
 public:
-    secmanp(bu_asc* acl,  bu_hci*  hci, const bdaddr_t& local, int ltyp,  const bdaddr_t& remote, int rtyp);
+    secmanp(Icryptos* pc, bu_asc* acl,  bu_hci*  hci, const bdaddr_t& local, int ltyp,  const bdaddr_t& remote, int rtyp);
     virtual ~secmanp();
 
     void on_encryption_changed(bool is_encrypted);
@@ -47,22 +47,22 @@ public:
 
 protected:
 private:
-    cryptos  _crypt;
-    bu_asc*  _aclbuffer;
-    bybuff  _iat;
-    bybuff  _ia;
-    bybuff  _rat;
-    bybuff  _ra;
-    bybuff  _preq;
-    bybuff  _pres;
-    bybuff  _pncf;
-    bybuff  _tk;
-    bybuff  _stk;
-    bybuff  _mangaler;
-    bybuff  _random;
-    bybuff  _r;
-    bybuff  _pcnf;
-    bu_hci*  _hci;
+    Icryptos* _crypt;
+    bu_asc*   _aclbuffer;
+    bybuff    _iat;
+    bybuff    _ia;
+    bybuff    _rat;
+    bybuff    _ra;
+    bybuff    _preq;
+    bybuff    _pres;
+    bybuff    _pncf;
+    bybuff    _tk;
+    bybuff    _stk;
+    bybuff    _mangaler;
+    bybuff    _random;
+    bybuff    _r;
+    bybuff    _pcnf;
+    bu_hci*   _hci;
 };
 
 

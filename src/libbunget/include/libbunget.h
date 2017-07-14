@@ -9,11 +9,8 @@
     products without the written consent of the author: marrius9876@gmail.com
 
 */
-
 #ifndef _LIB_bunget_H_
 #define _LIB_bunget_H_
-
-
 
 #include <stdio.h>
 #include <stdint.h>
@@ -23,8 +20,7 @@
 #include "uuid.h"
 #include "bluetooth.h"
 
-
-
+#define  LIBBUNGET_VERSION_STRING           "bunget library, version: 1.1.0, July 12 2017, Zyrexix Inc"
 
 /// these are the mumbo jumbo protocol shitty properties
 #define  VERSION_LIB_BUNGET                 100
@@ -183,6 +179,7 @@ public:
     uint8_t     _props;
 };
 
+
 class ISrvProc;
 class IServer
 {
@@ -214,11 +211,12 @@ public:
 
 };
 
+class Icryptos;
 class ISrvProc
 {
 public:
     virtual ~ISrvProc() {}
-    
+    virtual Icryptos* get_crypto()=0;
     virtual bool initHciDevice(int devid, const char* name)=0;
     virtual void onServicesDiscovered(std::vector<IHandler*>& els)=0;
     virtual bool onSpin(IServer* ps)=0;
@@ -232,6 +230,7 @@ public:
     virtual void onStatus(const HciDev* device)=0;
 };
 
+class Icryptos;
 class BtCtx
 {
 public:
