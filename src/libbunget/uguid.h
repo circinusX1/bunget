@@ -152,7 +152,7 @@ public:
     {
         return _u128;
     }
-    const uint8_t operator[](int index){
+    uint8_t operator[](int index){
 #if __BYTE_ORDER == __BIG_ENDIAN
         return _u128.value.u128.data[index];
 #else

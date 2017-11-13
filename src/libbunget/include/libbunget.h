@@ -20,7 +20,7 @@
 #include "uuid.h"
 #include "bluetooth.h"
 
-#define  LIBBUNGET_VERSION_STRING           "bunget library, version: 1.1.0, July 12 2017, Zyrexix Inc"
+#define  LIBBUNGET_VERSION_STRING           "bunget library, version: 1.2.0, Nov 13 2017, Zyrexix Inc, Canada"
 
 /// these are the mumbo jumbo protocol shitty properties
 #define  VERSION_LIB_BUNGET                 100
@@ -150,6 +150,7 @@ public:
     virtual IHandler* add_descriptor(const bt_uuid_t& uid, uint8_t prop, uint8_t* value, int len)=0;
     virtual IService* get_service()const=0;
     virtual uint16_t get_16uid()const=0;
+    virtual uint16_t get_handle()const=0;
     virtual const bt_uuid_t& get_128uid()const=0;
     virtual uint8_t get_props()const=0;
     virtual uint8_t get_perms()const=0;
@@ -193,7 +194,7 @@ public:
 
     virtual ~IServer() {}
     virtual void    power_switch(bool on)=0;
-    virtual int advertise(bool onoff)=0; ///returns device hci# or -1
+    virtual int advertise(int millisecs)=0;
     virtual int adv_beacon(const char* suid, uint16_t minor, uint16_t major, int8_t power, uint16_t manid, const uint8_t* data, uint8_t length)=0;  ///returns device hci# or -1
     virtual IService* add_service(uint16_t srvid, const char* name)=0;
     virtual IService* add_service(const bt_uuid_t& srvid, const char* name)=0;
@@ -208,6 +209,7 @@ public:
     virtual uint16_t handle()const=0;
     virtual int set_name(const char* btname)=0;
     virtual IServer::S_STATE status()const = 0;
+    virtual size_t  nServices()const     = 0;
 
 };
 
@@ -219,7 +221,7 @@ public:
     virtual Icryptos* get_crypto()=0;
     virtual bool initHciDevice(int devid, const char* name)=0;
     virtual void onServicesDiscovered(std::vector<IHandler*>& els)=0;
-    virtual bool onSpin(IServer* ps)=0;
+    virtual bool onSpin(IServer* ps, uint16_t notyUuid)=0;
     virtual void onReadRequest(IHandler* pc)=0;
     virtual int  onSubscribesNotify(IHandler* pc, bool b)=0;
     virtual void onWriteRequest(IHandler* pc)=0;
@@ -238,7 +240,7 @@ public:
     virtual ~BtCtx();
 
     static BtCtx* instance();
-    virtual IServer* new_server(ISrvProc* proc, int hcidev, const char* name, int tweak_delay=0)=0;
+    virtual IServer* new_server(ISrvProc* proc, int hcidev, const char* name, int tweak_delay=0, bool advall=0)=0;
 };
 
 /**
@@ -252,7 +254,6 @@ public:
     template <class T>int write(const T& val)
     {
         return _ph->put_value(&val, sizeof(val));
-
     }
 
     template <class T>

@@ -110,6 +110,7 @@ public:
     IService* get_service()const;
     H_ATT_TYPE get_type()const;
     uint16_t get_16uid()const;
+    uint16_t get_handle()const;
     const bt_uuid_t& get_128uid()const;
     uint8_t get_props()const;
     uint8_t get_perms()const;
@@ -143,15 +144,15 @@ public:
 class GattSrv : public IService, public GHandler
 {
 public:
-    GattSrv(uint16_t uuid, SrvDevice* p):GHandler(H_SRV, p, 0, uuid){}
-    GattSrv(const bt_uuid_t& uuid, SrvDevice* p):GHandler(H_SRV, p, 0, uuid){}
+    GattSrv(uint16_t uuid, SrvDevice* p):GHandler(H_SRV, p, 0, uuid),_default(false){}
+    GattSrv(const bt_uuid_t& uuid, SrvDevice* p):GHandler(H_SRV, p, 0, uuid),_default(false){}
     virtual ~GattSrv(){}
     IHandler*    add_charact(uint16_t uid, uint8_t prop, uint8_t perms, uint8_t format, uint8_t length, uint8_t *val=0);
     IHandler*    add_charact(const bt_uuid_t& uid, uint8_t prop, uint8_t perms, uint8_t format, uint8_t length, uint8_t *val=0);
     IHandler*    get_charact(const bt_uuid_t& uid);
     IHandler*    get_charact(uint32_t uid);
     const bt_uuid_t&   get_uid()const;
-
+    void        debug();
 private:
     GHandler*    _add_charct_value(uint16_t handle, uint32_t uid,  uint8_t length, uint8_t *val=0);
     GHandler*    _add_charct_value(uint16_t handle, const bt_uuid_t& uuid, uint8_t length, uint8_t *val=0);
@@ -160,6 +161,7 @@ private:
 public:
     uint16_t        _lasthndl;
     std::string     _name;
+    bool            _default;
 };
 
 

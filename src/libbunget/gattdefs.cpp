@@ -132,6 +132,17 @@ const bt_uuid_t&   GattSrv::get_uid()const
     return _cuid._u128;
 }
 
+void        GattSrv::debug()
+{
+    TRACE("---------------------------------");
+    TRACE("service" << _name);
+    uint16_t uid = this->_cuid.as16();
+    TRACE("UUID:"<< std::hex <<  uid << std::dec);
+    TRACE("LAST HANDLE:"<< _lasthndl);
+    TRACE("HANDLE:"<< _hndl);
+
+}
+
 /****************************************************************************************
 */
 GHandler::GHandler(H_ATT_TYPE typ, SrvDevice* ps, uint16_t hp, uint16_t uuid):_type(typ),
@@ -256,6 +267,11 @@ uint8_t GHandler::get_props()const
     return _props;
 }
 
+uint16_t GHandler::get_handle()const
+{
+    return this->_hndl;
+}
+
 /****************************************************************************************
 */
 uint8_t GHandler::get_perms()const
@@ -322,3 +338,4 @@ const uint8_t* GHandler::get_value()const
 {
     return _value;
 }
+

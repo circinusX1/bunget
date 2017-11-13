@@ -11,6 +11,7 @@
 */
 #include <dlfcn.h>
 #include <vector>
+#include "libbungetpriv.h"
 #include "bu_gap.h"
 #include "uguid.h"
 #include "bybuff.h"
@@ -52,16 +53,20 @@ void bu_gap::advertise(const std::string& name,
     {
         bybuff  advData;
         bybuff  scn;
+        size_t  nservs = _hci->srv()->nServices();
+
 
         advData << uint8_t(0x2) << uint8_t(0x1) << uint8_t(0x6);
-        advData<<(uint8_t(1 + 2 * srvs.size())) << (uint8_t(0x3));
+        advData<<(uint8_t(1 + 2 * nservs)) << (uint8_t(0x3));
         for(const auto  &s : srvs)
         {
             GattSrv* ps = dynamic_cast<GattSrv*>(s);
+            if(ps->_default)
+                continue;
+            ps->debug();
             uint16_t uid = ps->_cuid.as16();
             advData << uid;
         }
-
         scn<<uint8_t(1+name.length())<<uint8_t(0x8);
         scn<<name;
         _air_waveit(advData, scn);
@@ -146,7 +151,7 @@ DO NOT USE !!!
 */
 void bu_gap::set_pin(uint32_t pin)
 {
-    gap_set_auth_requirement_cp cp={0};
+    gap_set_auth_requirement_cp cp={0,0,{0},0,0,0,0,0};
 
     if(pin==0)
         cp.mitm_mode = MITM_PROTECTION_NOT_REQUIRED;

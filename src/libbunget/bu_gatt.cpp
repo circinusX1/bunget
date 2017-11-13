@@ -291,7 +291,7 @@ int bu_gatt::_type_q(const sdata& data, bybuff& ret)
 
     if (g.as16() == GATT_CHARAC_UUID)
     {
-        std::vector<GHandler*>      chrs;
+        std::vector<GHandler*>     chrs;
         Harray&                    handlers = srv()->handlers();
 
         for(const auto& e : handlers)

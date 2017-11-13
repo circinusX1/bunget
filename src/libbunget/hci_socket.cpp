@@ -279,13 +279,14 @@ bool hci_socket_ble::pool(int ttp, bool callhci)
     fd_set          read;
     struct timeval  to;
     int             tout = ttp==-1 ? 16 : ttp;
+    bool            got = false;
 
     FD_ZERO (&read);
     FD_SET (_sock, &read);
 
     while(--tout>0)
     {
-		to.tv_sec = 0;
+        to.tv_sec  = 0;
         to.tv_usec = 1024; // 1 milliseeond, ttp times
         int rv = ::select(_sock+1, &read, 0, 0, &to);
 		if(rv < 0)
@@ -299,12 +300,14 @@ bool hci_socket_ble::pool(int ttp, bool callhci)
 		if(rv==0)
 		{
 			if(_bytes)
+            {
+                got=true;
 				break;
+            }
             ::usleep(128);
 		}
 		if(FD_ISSET(_sock, &read))
 		{
-			FD_CLR (_sock, &read);
 			int len = this->read(_buff+_bytes, sizeof(_buff)-_bytes);
 			if(len > 0)
 				_bytes+=len;
@@ -317,13 +320,15 @@ bool hci_socket_ble::pool(int ttp, bool callhci)
 				break;
 			}
 		}
-	
+        FD_CLR (_sock, &read);
 	}
 	if(_bytes)
 		_notify_read();
-	if(callhci)
+
+    if(callhci)
 		_hci->onSpin(this);
-    return true;
+
+    return got;
 }
 
 /****************************************************************************************

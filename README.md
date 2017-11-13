@@ -2,7 +2,7 @@
 ## Tested on x86, R-PI, Nano-Pi, and CHIP
 ##
 ###      BUNGET
-##### Version 1.0.0, March 9 2016
+##### Version 1.2.0, Nov 13 2017
 ####### (Bunget, read 'ge' as in George)
 
 #### Build lib bunget and demo application
@@ -104,11 +104,12 @@ HCI: ACL_START
 GATT DATA:ATT_OP_READ_BY_GROUP_REQ  
 my_proc event: onServicesDiscovered 
   ```
-  * Tweak the receive<delay>send value at main line 127. . 
+  * Tweak the receive<delay>send value at main line (see code). . 
   * My Broadcom dongle works with >16 ms delay on R-PI and with >2 ms on 4 quad HP Intel PC.
+  * The advertise(interval in ms), is set to 512 milliseconds. This value is get's to low would flood the hci devices and some would require a power cycle
   
 ```javascript
-       IServer*    BS =  ctx->new_server(&procedure, dev, "advname", 0/* tweak delay*/);
+       IServer*    BS =  ctx->new_server(&procedure, dev, "advname", 0/* tweak delay*/, advallservices/* including HCI defaults*/);
 ```
 * Descriptors for data type not suppotred yet. Use GATT registerred UUIDS or know your type on both ends.
 
@@ -173,8 +174,8 @@ int main(int n, char* v[])
     BtCtx*      ctx = BtCtx::instance();        // get singleton Bunget instance
     my_proc     procedure;                      // callback  instance of above class
 
-    IServer*    BS =  ctx->new_server(&procedure, 0, "rpi-bunget", 0);      // one GATT server per hci device
-    IService*   ps = BS->add_service(0x123F,"demo");                        // add a service to the GATT server
+    IServer*    BS =  ctx->new_server(&procedure, 0, "rpi-bunget", 16, true);      // one GATT server per hci device
+    IService*   ps = BS->add_service(0x123F,"demo");                              // add a service to the GATT server
     
     //
     // add some characterisitcs
@@ -192,7 +193,7 @@ int main(int n, char* v[])
                               FORMAT_RAW, 20); // we send it as string 
 
     try{
-        BS->advertise(true);
+        BS->advertise(512);
         BS->run();
     }
     catch(hexecption& ex)
@@ -208,15 +209,17 @@ my_proc::my_proc()
     _prepare_gpio17();
 }
 
-bool my_proc::evLoop(IServer* ps)
+bool my_proc::evLoop(IServer* ps, uint16_t nHandle)
 {
     static int inawhile=0;
 
     // notification
-    if(_subscribed && inawhile++%600==0)
+    if(_subscribed)
     {
-        _send_value(TimeChr);
-        _send_value(Temp1Chr);
+	if(nHandle==TimeChr->get_handle())
+	        _send_value(TimeChr);
+	if(nHandle==Temp1Chr->get_handle())
+		_send_value(Temp1Chr);
     }
     return true;
 }

@@ -29,7 +29,6 @@ bu_hci::bu_hci(SrvDevice* psrv):_pev(psrv),
     _delay = 1024;
 #endif
     _socket = new hci_socket_ble(this);
-    //taken from bleno
     _aclMtu = 27;
     _aclPendingMax = 3;
 }
@@ -508,9 +507,7 @@ bool bu_hci::pool()
 
     if(check_dev_state() && _socket->valid())
     {
-        if(_socket->pool()==false)
-            return false;
-        return true;
+        rv = _socket->pool();
     }
     else
     {
@@ -959,7 +956,9 @@ void bu_hci::_onmeta(const no_evt_le_meta_event* leme)
         _TRACE("mm EVT_LE_READ_REMOTE_USED_FEATURES_COMPLETE" );
     }
     else
-        _TRACE("mm UNKNOWN META EVENT " << std::hex <<leme->leMetaEventType );
+    {
+        _TRACE("mm UNKNOWN META EVENT " << std::hex << leme->leMetaEventType << std::dec << std::endl);
+    }
 }
 
 /****************************************************************************************
@@ -1084,9 +1083,9 @@ void bu_hci::read_baddr()
 
 /****************************************************************************************
 */
-void bu_hci::_poolsocket(int msecs, int callmain)
+int bu_hci::_poolsocket(int msecs, int callmain)
 {
-    _socket->pool(msecs, callmain);
+    return _socket->pool(msecs, callmain);
 }
 
 
@@ -1098,21 +1097,17 @@ void bu_hci::_reconfigure()
     this->_clear();
 
     this->_set_hci_filter();
-    _poolsocket(100, false);
     this->_set_event_mask();
-    _poolsocket(100, false);
     this->_set_le_event_mask();
-    _poolsocket(100, false);
     this->_write_le_host();
-    _poolsocket(100, false);
     this->_read_version();
-    _poolsocket(100, false);
     this->_read_le_hosts();
-    _poolsocket(100, false);
     this->_read_baddr();
-    _poolsocket(100, false);
     this->_le_read_buffer_size();
-    _poolsocket(100, false);
+    while(_poolsocket(1024, false))
+    {
+        ::usleep(0xFFFF);
+    }
 }
 
 void bu_hci::enque_acl(uint16_t handle, uint16_t cid, const sdata& sd)

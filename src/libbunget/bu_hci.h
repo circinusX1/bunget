@@ -242,7 +242,7 @@ protected:
     void _onle_complette(const no_evt_le_meta_event* neleme);
     void _onle_con_update_complette(const no_evt_le_meta_event* neleme);
     void _reconfigure();
-    void _poolsocket(int lops=8, int callmain=true);
+    int  _poolsocket(int milis=64, int callmain=true);
     void _set_hci_filter();
     void _set_event_mask();
     void _set_le_event_mask();

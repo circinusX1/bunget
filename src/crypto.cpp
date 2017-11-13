@@ -11,7 +11,7 @@
 #include <time.h>
 #include "crypto.h"
 #include "bybuff.h"
-#include <crypto++/osrng.h>
+#include <crypto++/osrng.h> // sudo apt-get install uuid-dev libcrypto++-dev
 #include <crypto++/modes.h>
 #include <crypto++/aes.h>
 #include <crypto++/filters.h>

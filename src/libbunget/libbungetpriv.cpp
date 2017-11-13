@@ -11,6 +11,8 @@
 */
 
 #include <assert.h>
+#include <unistd.h>
+#include <sys/time.h>
 #include "bungetconf.h"
 #include "libbungetpriv.h"
 #include "ascon.h"
@@ -18,6 +20,12 @@
 #include "bu_gatt.h"
 #include "hci_config.h"
 
+#define MIN_NOTY_INTERVAL    128  // for hci USB
+// #define MIN_NOTY_INTERVAL    64   // for hci UART
+
+
+
+#define MIN_ADV_INTERVAL     160 // do not change this
 extern bool     __alive;
 ContextImpl*    Ctx;
 
@@ -26,14 +34,23 @@ ContextImpl*    Ctx;
 BtCtx::BtCtx(){};
 BtCtx::~BtCtx(){};
 
+inline size_t tick_count()
+{
+    struct timeval tv;
+    if(gettimeofday(&tv, NULL) != 0)
+            return 0;
+    return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
+}
+
 /****************************************************************************************
 */
-SrvDevice::SrvDevice(ISrvProc* proc, int& hcid, const char* name, int delay):_cb_proc(proc),
-                    _def(false),_hcidev(hcid),_advinterval(160)
+SrvDevice::SrvDevice(ISrvProc* proc, int& hcid, const char* name, int delay, bool advall):_cb_proc(proc),
+                    _def(false),_hcidev(hcid),_advinterval(MIN_ADV_INTERVAL),_advall(advall),_notyinterval(MIN_NOTY_INTERVAL)
 {
     _gapp = 0;
     _gatt = 0;
     _pacl = 0;
+    _curnoty = 0;
     _running = false;
     _name = name;
     _respdelay = delay;
@@ -45,6 +62,8 @@ SrvDevice::SrvDevice(ISrvProc* proc, int& hcid, const char* name, int delay):_cb
     _status = eOFFLINE;
     _maxMtu = 23;
     _pcrypt = _cb_proc->get_crypto();
+    _notytime = ::tick_count();
+
     if(_respdelay > 128 || _respdelay< 0)
         delay = 128; // nomore than 100 ms
 }
@@ -89,7 +108,7 @@ void SrvDevice::run()
     _status = eRUNNING;
     while(__alive)
     {
-        __alive = _hci->pool();
+        _hci->pool();
     }
     _status = eUNKNOWN;
 #endif
@@ -119,24 +138,20 @@ void SrvDevice::on_dev_status(bool onoff)
 
 /****************************************************************************************
 */
-int     SrvDevice::advertise(bool onoff)
+int     SrvDevice::advertise(int millis)
 {
-    if(onoff==true)
+    if(millis != 0)
     {
+        if(millis < MIN_NOTY_INTERVAL)
+            _notyinterval=MIN_NOTY_INTERVAL; // android does not handle more than ~1.3K / second
+        else
+            _notyinterval=millis;
+
         if(0==_hci)
         {
             on_configure_device(_hcidev);
 
             _hci = new bu_hci(this);
-            
-            /*
-            bybuff buff;
-            buff << "444444444444444444444444444444444444444444444444444444444444444444444444444444";
-            sdata sd;
-            sd.data=buff.buffer();
-            sd.len=buff.length();
-            _hci->enque_acl(1,1,sd);
-            */
             
             if(!_hci->init(_hcidev, false))
             {
@@ -145,7 +160,7 @@ int     SrvDevice::advertise(bool onoff)
                 _hcidev=-1;
             }
             _gapp =  new bu_gap(_hci);
-            _gatt= new bu_gatt(_hci);
+            _gatt = new bu_gatt(_hci);
             _gatt->setMaxMtu(_maxMtu);
             _gapp->advertise(_name.c_str(), _services, _pin);
         }
@@ -193,6 +208,27 @@ IService* SrvDevice::add_service(const bt_uuid_t& srvid, const char* name)
 
 /****************************************************************************************
 */
+size_t SrvDevice::nServices()const
+{
+    size_t count = 0;
+    for(const auto& s : _services)
+    {
+        GattSrv* ps = dynamic_cast<GattSrv*>(s);
+        if(_advall)
+        {
+            ++count;
+            continue;
+        }
+        if(ps->_default==false)
+        {
+            ++count;
+        }
+    }
+    return count;
+}
+
+/****************************************************************************************
+*/
 /****************************************************************************************
 */
 int SrvDevice::adv_beacon(const char* suid, uint16_t minor,
@@ -219,7 +255,6 @@ int SrvDevice::adv_beacon(const char* suid, uint16_t minor,
         _gatt= new bu_gatt(_hci);
     }
     length = std::min(uint8_t(20), length);
-
     bybuff by (data, length);
    _gapp->adv_beacon(cuid.as128(), minor, major, power, manid, by);
 
@@ -258,15 +293,21 @@ IService* SrvDevice::get_service(uint16_t srvid)
 */
 void SrvDevice::add_default_service()
 {
+    char hname[128] = {0};
     uint8_t apear[]={0x80,0x00};
-    IService* ps = add_service(0x1800,"name");
-
-    ps->add_charact(0x2a00, PROPERTY_READ,0,0,_name.length(),(uint8_t*)_name.c_str());
-    ps->add_charact(0x2a01, PROPERTY_READ,0,0,2,apear);
-
     uint8_t apear1[]={0x00,0x00,0x00,0x00};
-    ps = add_service(0x1801,"appear");
-    ps->add_charact(0x2a05, PROPERTY_INDICATE,0,0,4,apear1);
+
+    if(_name.empty())
+        ::gethostname(hname, sizeof(hname)-sizeof(char));
+    else
+        ::strcpy(hname, (_name.c_str()));
+    IService* ps = add_service(0x1800, hname);
+    ((GattSrv*)ps)->_default=true;
+    ps->add_charact(0x2a00, PROPERTY_READ,0,0,::strlen(hname),(uint8_t*)hname);
+    ps->add_charact(0x2a01, PROPERTY_READ,0,0,sizeof(apear),apear);
+    ps = add_service(0x1801, hname);
+    ((GattSrv*)ps)->_default=true;
+    ps->add_charact(0x2a05, PROPERTY_INDICATE,0,0,sizeof(apear1),apear1);
 }
 
 /****************************************************************************************
@@ -383,6 +424,7 @@ void SrvDevice::le_ltk_neg_reply(uint16_t handle)
 */
 void SrvDevice::onAdvertized(bool onoff)
 {
+    _notytime = ::tick_count();
     return _cb_proc->onAdvertized(onoff);
 }
 
@@ -390,11 +432,62 @@ void SrvDevice::onAdvertized(bool onoff)
 */
 bool SrvDevice::onSpin()
 {
+    bool rv = true;
+
     if(_status == eRUNNING)
     {
-        return _cb_proc->onSpin(this);
+        size_t ct = ::tick_count();
+        if(ct - _notytime > _notyinterval)
+        {
+            // get notification handle
+            _curnoty = _poolNextNotyHndl();
+            if(_curnoty)
+            {
+                TRACE("Notify Enabled for:" << std::hex << _curnoty << std::dec);
+            }
+            rv = _cb_proc->onSpin(this, _curnoty);
+            _notytime = ct;
+        }
+        else{
+            rv = _cb_proc->onSpin(this, 0);
+        }
     }
-    return true;
+    return rv;
+}
+
+uint16_t    SrvDevice::_poolNextNotyHndl()
+{
+    bool     skip = (_curnoty != 0);
+
+    for(auto &h : _handles)
+    {
+        if((h->_internal & INTERN_SUBSCRIBED) == 0)
+            continue;
+
+        if(h->_props & PROPERTY_NOTIFY)
+        {
+            if(h->_hndl == _curnoty){
+                skip = false;
+                continue;
+            }
+            if(skip){
+                continue;
+            }
+            return h->_hndl;
+        }
+    }
+
+    for(auto &h : _handles)
+    {
+        if((h->_internal & INTERN_SUBSCRIBED) == 0)
+            continue;
+
+        if(h->_props & PROPERTY_NOTIFY)
+        {
+            return h->_hndl;
+        }
+    }
+    return 0;
 }
 
 /****************************************************************************************
@@ -563,11 +656,12 @@ BtCtx* BtCtx::instance()
 IServer* ContextImpl::new_server(ISrvProc* proc, 
                                 int hcidev, 
                                 const char* name, 
-                                int tweak_delay)
+                                int tweak_delay,
+                                bool advall)
 {
     if(_adapters.find(hcidev) == _adapters.end())
     {
-        SrvDevice* p = new SrvDevice(proc, hcidev, name, tweak_delay);
+        SrvDevice* p = new SrvDevice(proc, hcidev, name, tweak_delay, advall);
         if(hcidev<0){
             delete p;
             return 0;

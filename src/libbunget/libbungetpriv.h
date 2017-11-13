@@ -45,10 +45,10 @@ enum {
 class SrvDevice : public IServer, public hci_event
 {
 public:
-    SrvDevice(ISrvProc* proc, int& hcid, const char* name, int delay=0);
+    SrvDevice(ISrvProc* proc, int& hcid, const char* name, int delay=0, bool advall=false);
     ~SrvDevice();
     void   power_switch(bool on);
-    int    advertise(bool onoff);
+    int    advertise(int millis);
     IService* add_service(uint16_t srvid, const char* name);
     IService* add_service(const bt_uuid_t& srvid, const char* name);
 
@@ -93,6 +93,7 @@ public:
     virtual void on_dev_status(bool onoff);
     virtual bool onSpin();
     virtual void onAdvertized(bool onoff);
+    virtual size_t  nServices()const;
     virtual S_STATE status()const{return _status;};
 //======================================
     virtual void on_configure_device(int devid);
@@ -140,6 +141,8 @@ public:
     uint16_t add(GHandler* g);
     void add_default_service();
 
+private:
+    uint16_t    _poolNextNotyHndl();
 
 public:
     ISrvProc*    _cb_proc;
@@ -174,6 +177,10 @@ private:
     int         _respdelay;
     int         _advinterval;
     int         _maxMtu;
+    bool        _advall;
+    size_t      _notyinterval;
+    size_t      _notytime;
+    uint16_t    _curnoty;
     std::vector<hci_data_eater*> _eaters;
     std::vector<IService*>      _services;
 };
@@ -189,7 +196,7 @@ public:
             delete a.second;
 
     }
-    virtual IServer* new_server(ISrvProc* proc, int hcidev, const char* name, int tweak_delay=0);
+    virtual IServer* new_server(ISrvProc* proc, int hcidev, const char* name, int tweak_delay=0, bool advall=false);
  private:
     std::map<int,IServer*> _adapters;
 };

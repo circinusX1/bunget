@@ -16,7 +16,7 @@ add_definitions(-DDEBUG)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fexceptions -Wall -fpermissive")
 include_directories(libbunget/include)
 include_directories(libbunget)
-add_executable (bunget main.cpp crypto.cpp)
+add_executable (bunget mainn.cpp crypto.cpp)
 
 ###
 ###  sudo apt-get install libcrypto++-dev
