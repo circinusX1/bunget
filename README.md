@@ -106,10 +106,10 @@ my_proc event: onServicesDiscovered
   ```
   * Tweak the receive<delay>send value at main line (see code). . 
   * My Broadcom dongle works with >16 ms delay on R-PI and with >2 ms on 4 quad HP Intel PC.
-  * The advertise(interval in ms), is set to 512 milliseconds. This value is get's to low would flood the hci devices and some would require a power cycle
+  * The advertise(interval in ms), is set to 512 milliseconds. If this value gets to low would flood the hci socket and some would require a power cycle. For maxim roughput drive an indicator or a read property from the mobile/client, using it's callback completion call shitty mechanism. 
   
 ```javascript
-       IServer*    BS =  ctx->new_server(&procedure, dev, "advname", 0/* tweak delay*/, advallservices/* including HCI defaults*/);
+       IServer*    BS =  ctx->new_server(&procedure, dev, "advname", 0/* tweak delay*/, advallservices /*including HCI defaults*/);
 ```
 * Descriptors for data type not suppotred yet. Use GATT registerred UUIDS or know your type on both ends.
 
@@ -193,7 +193,7 @@ int main(int n, char* v[])
                               FORMAT_RAW, 20); // we send it as string 
 
     try{
-        BS->advertise(512);
+        BS->advertise(512); // notification interval, A valid handler comes in evLoop()
         BS->run();
     }
     catch(hexecption& ex)
@@ -216,6 +216,7 @@ bool my_proc::evLoop(IServer* ps, uint16_t nHandle)
     // notification
     if(_subscribed)
     {
+        // send a notification when allowed by hNandle
 	if(nHandle==TimeChr->get_handle())
 	        _send_value(TimeChr);
 	if(nHandle==Temp1Chr->get_handle())
@@ -257,10 +258,13 @@ apt-get install cmake
 apt-get install  g++
 apt-get install  rfkill
 apt-get install libcrypto++-dev
-service bluetooth stop   # not mandatory
-update-rc.d -f  bluetooth remove   # not mandatory
+service bluetooth stop             # mandatory
+update-rc.d -f  bluetooth remove   # to make it permanent
+# on systemD use systemctl disable 'servicename'
 
-
+#
+# Clone this git
+#
 git clone https://github.com/comarius/bunget
 cd bunget
 cmake .
@@ -278,10 +282,9 @@ hci0:	Type: BR/EDR  Bus: USB
 	TX bytes:380 acl:0 sco:0 commands:34 errors:0
 
 # argument for hci0 is 0, for hci1 is 1 and so on
-# therefore we run our GATT server as
+# therefore we run bunget server as:
 
 ./bunget 0
-
 
 root@minibian:~/bunget/src/bin# ./bunget 0
 sh: echo: I/O error
@@ -309,22 +312,28 @@ my_proc event: onSubscribesNotify:3403=1
 - stop bunget
 - disable bluetooth service
 - stop bluetooth service
+- If you have X, kill bluetooth indicators from bars too.
 - kill any process which uses bluetooth (scripts, desktop daemons, etc.)
 - restart on the mobile the bluetooth service (off 5 seconds, then on / reboot recomanded on some chipsets)
 - Tweak the timout [0-64] in main ctx->new_server(&procedure, dev, hostname, <timeout>);
+- Use notification intervals larger then go smaller. Start at 0.5 seconds. 
 
 ### Tested with broadcom BT4 dongle on:
-
-   - Make sure any processes that uses BT is killed, otherwise the LE disconects, or fails to grab services.
 
 ####   C H I P
    - On board BT4 and default installed system. See the C H I P readme page.
    - USB dongle broadcom
-    
+   
+####   nano Pi NEO
+  - BTLE couple of dongles, including nonanme Chinesse dongles
+  
+####   nano Pi NEO2
+  - BTLE couple of dongles, including nonanme Chinesse dongles
+  - Onboard BTLE
 
 ####   R-PI 3
-  - Does not work with onboard UART bt on R-PI 3 !!!.
-     - https://github.com/comarius/bunget/blob/master/docs/r-pi3-uartle.log
+  - BTLE couple of dongles, including nonanme Chinesse dongles
+  - On board BTLE, with minor timing issues.
   - Linux minibian 4.4.17-v7+ #901 SMP Fri Aug 12 17:57:27 BST 2016 armv7l GNU/Linux
   - gcc (Raspbian 4.9.2-10) 4.9.2
   - g++ (Raspbian 4.9.2-10) 4.9.2
@@ -338,7 +347,6 @@ my_proc event: onSubscribesNotify:3403=1
   - Linux hp 3.19.0-32-generic #37~14.04.1-Ubuntu SMP Thu Oct 22 09:41:40 UTC 2015 x86_64 x86_64 x86_64 GNU/Linux
   - g++ (Ubuntu 4.8.4-2ubuntu1~14.04.3) 4.8.4
   - gcc (Ubuntu 4.8.4-2ubuntu1~14.04.3) 4.8.4
-
 
 
 #### Dongle USB used
@@ -362,8 +370,6 @@ my_proc event: onSubscribesNotify:3403=1
     
   - Failed with ACER   AI - 830
   - Failed with Android 4.4.2
-  
-
 
 #######################################################################
 
@@ -376,4 +382,7 @@ Questions, Bugs, Commercial usage: Contact by eMail for any questions: marrius98
 #######################################################################
 #### License:
 Free, for non commercial products. Personalised license from the Author for commercial products.
+
+Updated Nov 13.
+
 
