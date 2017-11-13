@@ -3,7 +3,7 @@
 ##
 ###      BUNGET
 ##### Version 1.2.0, Nov 13 2017
-####### (Bunget, read 'ge' as in George)
+###### Bunget, read 'ge' as in George
 
 #### Build lib bunget and demo application
 
