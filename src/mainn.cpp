@@ -19,7 +19,7 @@
     sudo mv fw-0a5c_21e8.hcd /lib/firmware/brcm/BCM20702A0-0a5c-21e8.hcd
 
  *              THIS IS A DEMO FOR LIBBUNGET
- * 
+ *
     This demo adds 1 service 0x123F with 3 characteristis.
         0x3400  control a GPIO pin, we connect a LED, on GPIO 17 '/sys/class/gpio/gpio17/value'
         0x3401
@@ -28,7 +28,7 @@
 */
 
 // test echo
-// #define XECHO
+// #define XECHO_BLENO
 
 #include <fstream>
 #include <iostream>
@@ -107,7 +107,7 @@ public:
     IHandler*   TimeChr;      // NIR
     IHandler*   Temp1Chr;     // NIR
     IHandler*   EchoCht;
-private:    
+private:
     cryptos     _crypt;         // MANDATORY, detached form lib, Use it on your own GNU
 };
 
@@ -134,19 +134,37 @@ int main(int n, char* v[])
         std::cout << "run under sudo credentials or setcap bunget !\n";
         //return -1;
     }
-    
+
     BtCtx*      ctx = BtCtx::instance();                // BT context
     my_proc     procedure;                              // this procedure
     int dev = ::atoi(v[1]);
-    
+
+    int srdel = 64;
+    if(n==3)
+        srdel = atoi(v[2]);
+
+
+
     try{
         // leave name empty for 'hostname'
-        IServer* BS =  ctx->new_server(&procedure, dev, "bunget", 32, true);
+#ifdef XECHO_BLENO
+        IServer* BS =  ctx->new_server(&procedure, dev, "echo", srdel, true);
+#else
+        IServer* BS =  ctx->new_server(&procedure, dev, "bunget", srdel, true);
+#endif
 #if 0   // not tested !!!
         //BS->set_name("advname"); // this is the bt name.
         //99999999-9999-9999-9999-999999999999
         BS->adv_beacon("11111111-1111-1111-1111-111111111111", 1, 10, -10, 0x004C, (const uint8_t*)"todo", 7);
 #endif // 0
+
+#ifdef XECHO_BLENO
+        IService*   ps = BS->add_service(0xec00,"echo");
+        procedure.EchoCht = ps->add_charact(0xec0e,PROPERTY_WRITE|PROPERTY_READ,
+                                 0,
+                                 FORMAT_RAW, 1); // 1 / 0
+
+#else
 
         IService*   ps = BS->add_service(0x123F,"bunget");
         procedure.LedChr = ps->add_charact(UID_GPIO,PROPERTY_WRITE|PROPERTY_INDICATE,
@@ -160,6 +178,7 @@ int main(int n, char* v[])
         procedure.Temp1Chr = ps->add_charact(UID_TEMP, PROPERTY_NOTIFY|PROPERTY_INDICATE,
                                   0,
                                   FORMAT_FLOAT, FORMAT_FLOAT_LEN); // we send it as float
+#endif
         BS->advertise(512);
         BS->run();
         BS->stop();
@@ -185,7 +204,7 @@ my_proc::my_proc()
 */
 bool my_proc::initHciDevice(int devid, const char* devn)
 {
-  
+
     char name[128];
     // system("service bluetoothd stop");
     // system("service bluetooth stop");
@@ -203,7 +222,7 @@ bool my_proc::initHciDevice(int devid, const char* devn)
     system(name);
     ::sprintf(name,"hciconfig hci%d noencrypt", devid);
     system(name);
-*/ 
+*/
     ::sprintf(name,"hciconfig hci%d noauth", devid);
     system(name);
     ::sprintf(name,"hciconfig hci%d noleadv", devid);
@@ -220,7 +239,7 @@ bool my_proc::initHciDevice(int devid, const char* devn)
 */
 
     printf("%s", "done dirty work\n");
-    
+
     return true;
 }
 
@@ -228,7 +247,6 @@ bool my_proc::initHciDevice(int devid, const char* devn)
 */
 bool my_proc::onSpin(IServer* ps, uint16_t notyUuid)
 {
-    static int roundrob;
     if(_kbhit()){
         if(getchar()=='q')
         return false;
@@ -267,10 +285,15 @@ bool my_proc::onSpin(IServer* ps, uint16_t notyUuid)
 */
     if(_subscribed)
     {
+#ifndef XECHO_BLENO
         if(notyUuid==TimeChr->get_handle())
             _send_value(TimeChr);
         else if(notyUuid==Temp1Chr->get_handle())
             _send_value(Temp1Chr);
+#else
+//        if(notyUuid==EchoCht->get_handle())
+//            _send_value(EchoCht);
+#endif
     }
     return true;
 }
@@ -482,12 +505,24 @@ void my_proc::_send_value(IHandler* pc)
             break;
         case  UID_TEMP:
             {
-                float ft = _get_temp();
+                //float ft = _get_temp();
                 //pc->put_value((uint8_t*)&ft,sizeof(float));
                 const char* fts = _get_temp_s();
                 pc->put_value((uint8_t*)fts,::strlen(fts));
             }
             break;
+        case  0xec0e:
+            {
+                //float ft = _get_temp();
+                //pc->put_value((uint8_t*)&ft,sizeof(float));
+                //const char* fts = _get_temp_s();
+                static int K=0;
+
+                char rands[32];
+                ::sprintf(rands,"%d", K++);
+                pc->put_value((uint8_t*)rands,::strlen(rands));
+            }
+        break;
         default:
             break;
     }

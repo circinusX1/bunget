@@ -31,7 +31,7 @@ bu_gatt::bu_gatt(bu_hci* hci):_hci(hci),_indicator(0)
 */
 void    bu_gatt::reset()
 {
-    _maxMtu  =  23;
+    _maxMtu  =  256;
     _mtu     =  23;
     _preparedWriteRequest  =  0;
     _uidsize = 2;
@@ -143,14 +143,15 @@ int bu_gatt::on_sock_data(uint8_t code, const sdata& data)
         case ATT_OP_MTU_REQ://2
         {
             uint16_t mtu = oa2t<uint16_t>(data.data,1);
-			uint16_t mtu2 = htobs(mtu);
-            if (mtu < 23)
-                mtu = 23;
-            else if (mtu > _maxMtu)
-                mtu = _maxMtu;
-            _mtu = mtu;
+	    uint16_t mtu2 = htobs(mtu);
+            if (mtu2 < 23)
+                mtu2 = 23;
+            else if (mtu2 > _maxMtu)
+                mtu2 = _maxMtu;
+            _mtu = mtu2;
+	    TRACE("mtu = " << int(_mtu));
             ret << uint8_t(ATT_OP_MTU_RESP);
-            ret << uint16_t(mtu);
+            ret << uint16_t(htobs(_mtu));
         }
         break;
 
@@ -205,7 +206,6 @@ int bu_gatt::on_sock_data(uint8_t code, const sdata& data)
 */
 int bu_gatt::_send(const bybuff& data)
 {
-    uint8_t rqt = data.buffer()[0];
     _pacls->write(ATT_CID, data);
     return 0;
 };
@@ -225,25 +225,28 @@ int bu_gatt::_group_q(const sdata& data, bybuff& ret)
 {
     uint16_t hs = oa2t<uint16_t>(data.data,1);
     uint16_t he = oa2t<uint16_t>(data.data,3);
+
+    TRACE(__FUNCTION__ << " start h = " << int(hs) << "," << int(he) << "\n");
+
     Cguid    g(data.data+5);
     std::vector<GattSrv*>   srvs;
-    Harray&                 handlers = srv()->handlers();
-    int                     subservices = H_SRV;
+    Harray&  handlers = srv()->handlers();
+    int      subservices = H_SRV;
 
-
+	ret.reset();
 	if(g.as16() != GATT_PRIM_SVC_UUID)
-		subservices =  H_SRV_INC;
+        	subservices =  H_SRV_INC;
+
 	for(const auto& e : handlers)
 	{
-		if(e->_hndl>he)break;
+        	if(e->_hndl>he)break;
 		if(e->_hndl<hs)continue;
-		if(e->_type==subservices)
+		        if(e->_type==subservices)
 		{
-            TRACE("Adding service: " << e->_hndl);
-			srvs.push_back((GattSrv*)e);
+	            TRACE("adding handler: " << int(e->_hndl) << " type = " << e->_type);
+		    srvs.push_back((GattSrv*)e);
 		}
 	}
-	
 	size_t nsrvs = srvs.size();
 	if(nsrvs==0)
 	{
@@ -258,11 +261,15 @@ int bu_gatt::_group_q(const sdata& data, bybuff& ret)
 
         ret << uint8_t(ATT_OP_READ_BY_GROUP_RESP);
         ret << uint8_t(lengthPerService);
+        TRACE("writing service:" << elems );
         for(const auto& ps : srvs)
         {
             ret << uint16_t(ps->_hndl);
             ret << uint16_t(ps->_lasthndl);
+
+            TRACE(" adding service " << std::hex << int(ps->_hndl) << std::dec<<"\n");
             ret << ps->_cuid;
+
             if(--elems==0)
                 break;
         }
@@ -289,6 +296,11 @@ int bu_gatt::_type_q(const sdata& data, bybuff& ret)
     uint16_t he = oa2t<uint16_t>(data.data,3);
     Cguid    g(data.data+5);
 
+
+
+    TRACE(__FUNCTION__ << "start h = " << int(hs) << "," << int(he) << "\n");
+
+    ret.reset();
     if (g.as16() == GATT_CHARAC_UUID)
     {
         std::vector<GHandler*>     chrs;
@@ -407,6 +419,8 @@ int bu_gatt::_info_q(const sdata& data, bybuff& ret)
 {
     uint16_t hs = oa2t<uint16_t>(data.data,1);
     uint16_t he = oa2t<uint16_t>(data.data,3);
+
+
     Harray&  handlers = srv()->handlers();
     Cguid    uuid;
     GHandler*  prev;
@@ -540,6 +554,7 @@ int bu_gatt::_write_q(const sdata& data, bybuff& ret)
     bybuff    vdata(data.data+3, data.len-3);
     GHandler* pel = srv()->gatel(vhh);
 
+    ret.reset();
     if(pel == 0)
     {
         return _reply_err(rqt, vhh, ATT_ECODE_INVALID_HANDLE, ret);
@@ -619,11 +634,15 @@ int bu_gatt::_find_type_q(const sdata& data, bybuff& ret)
 {
     uint16_t hs = oa2t<uint16_t>(data.data,1);
     uint16_t he = oa2t<uint16_t>(data.data,3);
+
+    TRACE(__FUNCTION__ << "start h = " << int(hs) << "," << int(he) << "\n");
+
     Cguid    uuid(data.data+5);
     uint16_t val16 = oa2t<uint16_t>(data.data,3);
     Harray&  handlers = srv()->handlers();
     std::vector<uint16_t> sehandlers;
 
+    ret.reset();
     for(const auto& e : handlers)
     {
         if(e->_hndl>he)break;
@@ -671,6 +690,7 @@ int bu_gatt::_read_blob(const sdata& data, bybuff& ret)
     bybuff    dataRet;
     uint8_t   result = 0xFF;
 
+    ret.reset();
     if(0 == element)
     {
         return _reply_err(rqt, vhh, ATT_ECODE_INVALID_HANDLE, ret);
@@ -760,6 +780,7 @@ int bu_gatt::_prep_wq(const sdata& indata, bybuff& ret)
     bybuff   data(indata.data+5, indata.len-5);
     GHandler* element =srv()->gatel(vhh);
 
+    ret.reset();
     if(0 == element)
     {
         return _reply_err(rqt, vhh, ATT_ECODE_INVALID_HANDLE, ret);
@@ -822,6 +843,7 @@ int bu_gatt::_exec_wq(const sdata& data, bybuff& ret)
     uint8_t  rqt = data.data[0];
     uint8_t  flag = data.data[1];
 
+    ret.reset();
     if (_prepareWQ._hndl)
     {
         GHandler* element = srv()->gatel(_prepareWQ._hndl);

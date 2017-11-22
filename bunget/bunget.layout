@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<FileVersion major="1" minor="0" />
+	<ActiveTarget name="Debug" />
+	<File name="../src/libbunget/ascon.cpp" open="1" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1206" topLine="27" />
+		</Cursor>
+	</File>
+	<File name="../src/libbunget/gattdefs.cpp" open="1" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="10356" topLine="246" />
+		</Cursor>
+	</File>
+	<File name="../src/libbunget/bu_gatt.cpp" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="22791" topLine="765" />
+		</Cursor>
+	</File>
+	<File name="../src/libbunget/bu_hci.cpp" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="20549" topLine="765" />
+		</Cursor>
+	</File>
+	<File name="../src/libbunget/bu_hci.h" open="1" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="7128" topLine="211" />
+		</Cursor>
+	</File>
+	<File name="../src/libbunget/include/libbunget.h" open="1" top="1" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="621" topLine="2" />
+		</Cursor>
+	</File>
+	<File name="../src/crypto.cpp" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3297" topLine="95" />
+		</Cursor>
+	</File>
+	<File name="../src/libbunget/libbungetpriv.cpp" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2142" topLine="79" />
+		</Cursor>
+	</File>
+	<File name="../src/mainn.cpp" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3449" topLine="111" />
+		</Cursor>
+	</File>
+	<File name="../src/libbunget/hci_socket.cpp" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="8102" topLine="284" />
+		</Cursor>
+	</File>
+	<File name="../src/crypto.h" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="227" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="../src/libbunget/bybuff.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4872" topLine="208" />
+		</Cursor>
+	</File>
+	<File name="../src/libbunget/bu_gap.cpp" open="1" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2888" topLine="83" />
+		</Cursor>
+	</File>
+</CodeBlocks_layout_file>

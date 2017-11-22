@@ -47,16 +47,34 @@ const uint8_t*  t2o(T data, uint8_t* arr)
 template <class T>
 T oa2t(const uint8_t *bytes, size_t offset)
 {
-	uint8_t input[4];
+    union{
+        uint8_t input[8];
+        uint8_t  u8;
+        uint16_t u16;
+        uint32_t u32;
+        uint64_t u64;
+    }tu;
+
     for(unsigned int i = 0; i < sizeof(T); i++)
     {
 #if __BYTE_ORDER == __BIG_ENDIAN
-        input[i] = bytes[sizeof(T)-1-i+offset];
+        tu.input[i] = bytes[sizeof(T)-1-i+offset];
 #else
-    	input[i] = bytes[i+offset];
+        tu.input[i] = bytes[i+offset];
 #endif
     }
-    return ((T)(*input));
+    switch(sizeof(T))
+    {
+        case 1:
+            return tu.u8;
+        case 2:
+            return tu.u16;
+        case 4:
+            return tu.u32;
+        case 8:
+            return tu.u32;
+    }
+    return tu.u32;
 }
 
 template <class T>
@@ -75,20 +93,18 @@ class bybuff
 {
 public:
     bybuff(size_t sz=0){
-        _buff.reserve(32); //minimize initial reallocs
-        if(sz>0)
-            _buff.reserve(sz);
+        _buff.clear();
     };
 
     bybuff(const uint8_t* buff, int len){
-        _buff.reserve(32); //minimize reallocation
+        _buff.clear();        
         for(int k=0;k<len;k++)
             _buff.push_back(buff[k]);
         _readindex=0;
     }
 
      bybuff(const bybuff& r){
-        _buff.reserve(32); //minimize reallocation
+        _buff.clear();        
         for(size_t k=0;k<r.length();k++)
             _buff.push_back(r._buff[k]);
         _readindex=0;

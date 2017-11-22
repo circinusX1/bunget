@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="bunget" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/bunget" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters="0" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/bunget" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-std=c++11" />
+			<Add option="-fexceptions" />
+			<Add option="-DDEBUG" />
+			<Add option="-DACL_MTU_FRAG" />
+			<Add directory="../src/libbunget/include" />
+			<Add directory="../src/libbunget" />
+			<Add directory="../src" />
+		</Compiler>
+		<Linker>
+			<Add library="crypto++" />
+		</Linker>
+		<Unit filename="../src/crypto.cpp" />
+		<Unit filename="../src/crypto.h" />
+		<Unit filename="../src/libbunget/ascon.cpp" />
+		<Unit filename="../src/libbunget/ascon.h" />
+		<Unit filename="../src/libbunget/bt_incinpl.cpp" />
+		<Unit filename="../src/libbunget/bt_socket.cpp" />
+		<Unit filename="../src/libbunget/bt_socket.h" />
+		<Unit filename="../src/libbunget/bu_gap.cpp" />
+		<Unit filename="../src/libbunget/bu_gap.h" />
+		<Unit filename="../src/libbunget/bu_gatt.cpp" />
+		<Unit filename="../src/libbunget/bu_gatt.h" />
+		<Unit filename="../src/libbunget/bu_hci.cpp" />
+		<Unit filename="../src/libbunget/bu_hci.h" />
+		<Unit filename="../src/libbunget/bungetconf.h" />
+		<Unit filename="../src/libbunget/bybuff.cpp" />
+		<Unit filename="../src/libbunget/bybuff.h" />
+		<Unit filename="../src/libbunget/cmake_install.cmake" />
+		<Unit filename="../src/libbunget/gattdefs.cpp" />
+		<Unit filename="../src/libbunget/gattdefs.h" />
+		<Unit filename="../src/libbunget/hci_config.cpp" />
+		<Unit filename="../src/libbunget/hci_config.h" />
+		<Unit filename="../src/libbunget/hci_socket.cpp" />
+		<Unit filename="../src/libbunget/hci_socket.h" />
+		<Unit filename="../src/libbunget/include/bluetooth.h" />
+		<Unit filename="../src/libbunget/include/hci.h" />
+		<Unit filename="../src/libbunget/include/hci_lib.h" />
+		<Unit filename="../src/libbunget/include/icryptos.h" />
+		<Unit filename="../src/libbunget/include/l2cap.h" />
+		<Unit filename="../src/libbunget/include/libbunget.h" />
+		<Unit filename="../src/libbunget/include/rfcomm.h" />
+		<Unit filename="../src/libbunget/include/sco.h" />
+		<Unit filename="../src/libbunget/include/uuid.h" />
+		<Unit filename="../src/libbunget/l2cap_socket.cpp" />
+		<Unit filename="../src/libbunget/l2cap_socket.h" />
+		<Unit filename="../src/libbunget/lebiendians.h" />
+		<Unit filename="../src/libbunget/libbungetpriv.cpp" />
+		<Unit filename="../src/libbunget/libbungetpriv.h" />
+		<Unit filename="../src/libbunget/rfcomm_socket.cpp" />
+		<Unit filename="../src/libbunget/rfcomm_socket.h" />
+		<Unit filename="../src/libbunget/sco_socket.cpp" />
+		<Unit filename="../src/libbunget/sco_socket.h" />
+		<Unit filename="../src/libbunget/secmanp.cpp" />
+		<Unit filename="../src/libbunget/secmanp.h" />
+		<Unit filename="../src/libbunget/uguid.cpp" />
+		<Unit filename="../src/libbunget/uguid.h" />
+		<Unit filename="../src/mainn.cpp" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

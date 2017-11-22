@@ -1,0 +1,3 @@
+/home/pi/bunget/src/libbunget/CMakeFiles/edit_cache.dir
+/home/pi/bunget/src/libbunget/CMakeFiles/rebuild_cache.dir
+/home/pi/bunget/src/libbunget/CMakeFiles/bunget.dir

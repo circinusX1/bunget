@@ -20,7 +20,7 @@
 #include "uuid.h"
 #include "bluetooth.h"
 
-#define  LIBBUNGET_VERSION_STRING           "bunget library, version: 1.2.0, Nov 13 2017, Zyrexix Inc, Canada"
+#define  LIBBUNGET_VERSION_STRING           "bunget library, version: 1.2.1, Nov 22 2017, © 2017-Zyrexix.Inc"
 
 /// these are the mumbo jumbo protocol shitty properties
 #define  VERSION_LIB_BUNGET                 100

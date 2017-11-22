@@ -30,7 +30,7 @@ IHandler*    GattSrv::add_charact(uint16_t uid, uint8_t props, uint8_t secure, u
         uint8_t  val[]={0x00,0x00};
         GHandler* pd = (GHandler*)pci->add_descriptor(0x2902,PROPERTY_READ|PROPERTY_WRITE_NO_RESPONSE|PROPERTY_WRITE,(uint8_t*)val,2);
         pd->_hparent = pci->_hndl;
-        this->_lasthndl = pd->_hndl;
+        this->_lasthndl = pd->_hndl; //mcoo
     }
     return pci;
 }
@@ -58,13 +58,13 @@ IHandler*    GattSrv::add_charact(const bt_uuid_t& uid, uint8_t props, uint8_t s
 */
 void GattSrv::_ctor(GHandler* pci, uint8_t props, uint8_t secure, uint8_t format, uint8_t length, uint8_t *val)
 {
-    pci->_type   = H_CHR;
+    if(pci->_type==0)pci->_type   = H_CHR;
     pci->_srv    = this->_srv;
     pci->_props  = props;
     pci->_secure = secure;
     pci->_format = format;
     pci->_hndl   = _srv->add_gattel(pci);
-    this->_lasthndl = pci->_hndl;
+    this->_lasthndl = pci->_hndl; //mcooo
     pci->_hparent = this->_hndl;
 }
 
@@ -73,7 +73,7 @@ void GattSrv::_ctor(GHandler* pci, uint8_t props, uint8_t secure, uint8_t format
 GHandler*    GattSrv::_add_charct_value(uint16_t handle, uint32_t uid, uint8_t length, uint8_t *val)
 {
     GHandler* pciv = new GHandler(H_CHR_VALUE, _srv, _hndl, uid);
-    pciv->_type  = H_CHR_VALUE;
+    if(pciv->_type==0)pciv->_type  = H_CHR_VALUE;
     pciv->_srv   =  this->_srv;
     pciv->_length=length;
     if(length){
@@ -85,7 +85,7 @@ GHandler*    GattSrv::_add_charct_value(uint16_t handle, uint32_t uid, uint8_t l
         }
     }
     pciv->_hndl = _srv->add_gattel(pciv);
-    this->_lasthndl = pciv->_hndl;
+    this->_lasthndl = pciv->_hndl; //mcooo
     return pciv;
 }
 
@@ -94,7 +94,7 @@ GHandler*    GattSrv::_add_charct_value(uint16_t handle, uint32_t uid, uint8_t l
 GHandler*    GattSrv::_add_charct_value(uint16_t handle, const bt_uuid_t& uuid, uint8_t length, uint8_t *val)
 {
     GHandler* pciv = new GHandler(H_CHR_VALUE, _srv, _hndl, uuid);
-    pciv->_type  = H_CHR_VALUE;
+    if(pciv->_type==0)pciv->_type  = H_CHR_VALUE;
     pciv->_srv   =  this->_srv;
     pciv->_length=length;
     if(length)
@@ -107,7 +107,7 @@ GHandler*    GattSrv::_add_charct_value(uint16_t handle, const bt_uuid_t& uuid, 
         }
     }
     pciv->_hndl = _srv->add_gattel(pciv);
-    this->_lasthndl = pciv->_hndl;
+    this->_lasthndl = pciv->_hndl; //mcooo
     return pciv;
 }
 

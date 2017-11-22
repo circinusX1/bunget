@@ -57,7 +57,8 @@ int bt_socket:: writeocts(const uint8_t* buffer, int sizeb)
 {
 
     bybuff  data(buffer,sizeb);
-    TRACE("\n<--[" <<int(data.length())<<"]" << data.to_string());
     int r = ::write(this->_sock, buffer, sizeb);
+    TRACE("\n<--[" <<int(data.length())<<"/"<<r<<"]" << data.to_string());
+    ::fsync(this->_sock);
 	return r;
 }

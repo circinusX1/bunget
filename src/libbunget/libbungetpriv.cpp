@@ -53,7 +53,6 @@ SrvDevice::SrvDevice(ISrvProc* proc, int& hcid, const char* name, int delay, boo
     _curnoty = 0;
     _running = false;
     _name = name;
-    _respdelay = delay;
     _hcistatus = STATE_POWEREDOFF;
     _advstatus = 0;
     _scanrespdatastatus = 0;
@@ -63,9 +62,7 @@ SrvDevice::SrvDevice(ISrvProc* proc, int& hcid, const char* name, int delay, boo
     _maxMtu = 23;
     _pcrypt = _cb_proc->get_crypto();
     _notytime = ::tick_count();
-
-    if(_respdelay > 128 || _respdelay< 0)
-        delay = 128; // nomore than 100 ms
+    _respdelay = delay;
 }
 
 /****************************************************************************************
@@ -443,7 +440,7 @@ bool SrvDevice::onSpin()
             _curnoty = _poolNextNotyHndl();
             if(_curnoty)
             {
-                TRACE("Notify Enabled for:" << std::hex << _curnoty << std::dec);
+                TRACE("Notify Enabled for:" << std::hex << int(_curnoty) << std::dec);
             }
             rv = _cb_proc->onSpin(this, _curnoty);
             _notytime = ct;
@@ -506,8 +503,9 @@ void SrvDevice::on_disconnect(const evt_disconn_complete* evdc)
     _gatt->reset();
     delete _pacl;  _pacl = 0;
     this->data_unsubscribe(_gatt);
-    _gapp->restart_adv();
     _cb_proc->onStatus(0);
+    _gapp->restart_adv();
+
     _eaters.clear();
 }
 

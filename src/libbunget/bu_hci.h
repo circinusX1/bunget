@@ -209,7 +209,6 @@ public:
     bu_hci(SrvDevice* pev);
     virtual ~bu_hci();
     bool init(int& devid, bool userchannel);
-    bool pool();
     void send_cmd(uint16_t ogf, uint16_t ocf, uint8_t plen, void *param);
     void set_adv_data(const sdata& data);
     void set_sca_res_data(const sdata& data);
@@ -228,6 +227,7 @@ public:
     void enque_acl(uint16_t handle, uint16_t cid, const sdata& sd);
     void write_acl_chunk(uint16_t handle);
     void flush_acl();
+    bool pool(int ms=1);
     virtual void on_error(const hci_error& error);
     virtual bool onSpin(bt_socket* sock);
     virtual int on_sock_data(uint8_t code, const sdata& buffer);
@@ -253,6 +253,7 @@ protected:
     void _set_adv_params(int interval);
     void _onhci_state_chnaged(HCI_STATE);
     void _write_sock(const uint8_t* pt, size_t sz){
+        if(_delay)::usleep(_delay);
         int ret = _socket->writeocts(pt, sz);
         if(_delay)::usleep(_delay);
         if((size_t)ret != sz)
@@ -260,6 +261,7 @@ protected:
     }
     template <typename T>void _write_sock(const T& t, size_t sz=sizeof(T))
     {
+        if(_delay)::usleep(_delay);
         size_t ret = _socket->write(t, sz);
         if(_delay)::usleep(_delay);
         if(ret != sz)

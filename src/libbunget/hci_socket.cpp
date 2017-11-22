@@ -131,11 +131,12 @@ int hci_socket_ble::bind_raw(int* devId)
         _addressType = int(di.type);
         if (_addressType == 3)//hack
             _addressType = 1;
-		
+
 		if (hci_test_bit(HCI_INQUIRY, &di.flags))
 			_send_cmd(OCF_INQUIRY_CANCEL, OGF_LINK_CTL,0,0);
 		else
 			_send_cmd(OCF_EXIT_PERIODIC_INQUIRY, OGF_LINK_CTL,0,0);
+
     }
     return this->_devId;
 }
@@ -281,53 +282,34 @@ bool hci_socket_ble::pool(int ttp, bool callhci)
     int             tout = ttp==-1 ? 16 : ttp;
     bool            got = false;
 
-    FD_ZERO (&read);
-    FD_SET (_sock, &read);
-
-    while(--tout>0)
-    {
+    do{
+        FD_ZERO (&read);
+        FD_SET (_sock, &read);
         to.tv_sec  = 0;
-        to.tv_usec = 1024; // 1 milliseeond, ttp times
+        to.tv_usec = 1024;
         int rv = ::select(_sock+1, &read, 0, 0, &to);
-		if(rv < 0)
-		{
-			hci_error e;
-			e.nerror = errno;
-			e.message="network-error";
-			_hci->on_error(e);
-			return false;
-		}
-		if(rv==0)
-		{
-			if(_bytes)
-            {
+        if(rv < 0)
+        {
+            hci_error e;
+            e.nerror = errno;
+            e.message="network-error";
+            _hci->on_error(e);
+            return false;
+        }
+        if(FD_ISSET(_sock, &read))
+        {
+            int len = this->read(_buff, sizeof(_buff));
+            if(len > 0){
+                _bytes=len;
                 got=true;
-				break;
             }
-            ::usleep(128);
-		}
-		if(FD_ISSET(_sock, &read))
-		{
-			int len = this->read(_buff+_bytes, sizeof(_buff)-_bytes);
-			if(len > 0)
-				_bytes+=len;
-			else{
-				hci_error e;
-				e.nerror = errno;
-				e.message="netdown";
-				_hci->on_error(e);
-                TRACE("socket error ...........");
-				break;
-			}
-		}
+        }
         FD_CLR (_sock, &read);
-	}
-	if(_bytes)
-		_notify_read();
-
-    if(callhci)
-		_hci->onSpin(this);
-
+        if(_bytes)
+	    _notify_read();
+        if(callhci)
+	    _hci->onSpin(this);
+    }while(--ttp>0);
     return got;
 }
 
