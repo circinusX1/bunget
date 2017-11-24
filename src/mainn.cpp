@@ -139,7 +139,7 @@ int main(int n, char* v[])
     my_proc     procedure;                              // this procedure
     int dev = ::atoi(v[1]);
 
-    int srdel = 64;
+    int srdel = 0;
     if(n==3)
         srdel = atoi(v[2]);
 

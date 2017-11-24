@@ -35,6 +35,7 @@ public:
     int bind_user(int* devId);
     void bind_ctrl();
     bool is_up();
+    void close();
     void set_filter(const uint8_t* data, int length);
     int read(uint8_t* buffer, int sizeb);
     bool pool(int time = 10, bool callhci=true);

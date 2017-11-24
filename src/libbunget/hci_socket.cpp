@@ -225,7 +225,7 @@ int hci_socket_ble::read(uint8_t* buffer, int sizeb)
     int length = bt_socket::read(buffer, sizeb);
     if (length > 0 && this->_mode == HCI_CHANNEL_RAW)
     {
-        this->_tweakHciKernel(sizeb, buffer);
+        this->_tweakHciKernel(length, buffer);
     }
     return length;
 }
@@ -322,6 +322,16 @@ void hci_socket_ble::_notify_read()
 	packed.len = (uint16_t)_bytes;
 	_hci->on_sock_data(0, packed);
 	_bytes = 0;
+}
+
+void hci_socket_ble::close()
+{
+//_l2sockets
+	std::map<uint16_t,int>::iterator i =  _l2sockets.begin();
+	for(;i!=_l2sockets.end();++i)
+		::close(i->first);
+	_l2sockets.clear();
+	bt_socket::close();
 }
 
 // taken from BluetoothHciSocket.cpp

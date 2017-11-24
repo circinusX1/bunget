@@ -255,7 +255,6 @@ protected:
     void _write_sock(const uint8_t* pt, size_t sz){
         if(_delay)::usleep(_delay);
         int ret = _socket->writeocts(pt, sz);
-        if(_delay)::usleep(_delay);
         if((size_t)ret != sz)
             _THROW("socket send error");
     }
@@ -263,7 +262,6 @@ protected:
     {
         if(_delay)::usleep(_delay);
         size_t ret = _socket->write(t, sz);
-        if(_delay)::usleep(_delay);
         if(ret != sz)
             _THROW("socket send error");
     }

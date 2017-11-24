@@ -7,6 +7,8 @@
 ##
 
 cmake_minimum_required (VERSION 2.6)
+
+#include(${CMAKE_CURRENT_SOURCE_DIR}/libbunget/CMakeLists.txt)
 PROJECT(BUNGET)
 
 set(CMAKE_C_COMPILER "gcc")
