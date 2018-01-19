@@ -1,2 +1,10 @@
 src/CMakeCache.txt
 src/libbunget/CMakeCache.txt
+**/.AppleDouble/
+**/CMakeFiles/
+bin/
+**/cmake_install.cmake
+lib/
+**/Makefile
+**/nbproject/
+
