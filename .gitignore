@@ -1,10 +1,21 @@
-src/CMakeCache.txt
-src/libbunget/CMakeCache.txt
-**/.AppleDouble/
+# Ignore CMAKE artifacts
+**/CMakeCache.txt
 **/CMakeFiles/
-bin/
 **/cmake_install.cmake
-lib/
 **/Makefile
+
+# Ignore artifact folders
+app/bin/
+link/
+
+# Ignore Netbeans files
 **/nbproject/
 
+# Ignore Apple files
+**/.DS_Store
+**/.AppleDouble/
+
+# Ignore codeblocks files
+**/*.cbp
+**/*.pro
+**/*.project
