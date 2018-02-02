@@ -97,7 +97,7 @@ void cryptos::_sha_encrypt(const bybuff& key, const bybuff& data, bybuff& out)co
     //AES encryption uses a secret key of a variable length (128-bit, 196-bit or 256-
     //bit). This key is secretly exchanged between two parties before communication
     //begins. DEFAULT_KEYLENGTH= 16 bytes
-    uint8_t iv[ CryptoPP::AES::BLOCKSIZE ] = {0};
+    //uint8_t iv[ CryptoPP::AES::BLOCKSIZE ] = {0};
     std::string encoded;
     try{
 #if 0
