@@ -5,17 +5,6 @@
 ##### Version 1.2.0, Nov 13 2017
 ###### Bunget, read 'ge' as in George
 
-#### Build lib bunget and demo application
-
-### Prerequisites 
-* Linux
-  * sudo apt-get install uuid-dev
-  * sudo apt-get install cmake
-  * sudo apt-get install build-essential
-  * sudo apt-get install libcrypto++-dev
-  
-
-
 ### Description:
 
 BUNGET is a C++ library for Linux which help to write GAP/GATT servers (Bluetooth 4.0). It provides abstract classes and methods to create GATT services, characteristics (READ/WRITE/NOTIFICATIONS). The library does not require the Bluez, but it requires some bluetooth utilities. The library was written from scratch. The idea of writing 'yet another BTLE implemetation' came after I spend days and days trying Bluez and Bleno. I could not get Blues working programatically and easy. Bleno is terible slow and tremendous resource eater, also brings entire java enciclopedia along with. 
@@ -228,6 +217,21 @@ bool my_proc::evLoop(IServer* ps, uint16_t nHandle)
 ```
 # Building 
 
+## Needed components
+
+```bash
+sudo apt-get update
+sudo apt-get install bluez # (needed for hciconfig utility for now)
+sudo apt-get install cmake
+sudo apt-get install g++
+sudo apt-get install rfkill
+sudo apt-get install libcrypto++-dev
+sudo apt-get install uuid-dev
+sudo apt-get install cmake
+sudo apt-get install build-essential
+
+```
+
 ## Raspberry PI Build (check compiler version )
   - The C compiler identification is GNU 4.9.2
   - Board: RPI-2
@@ -236,29 +240,13 @@ bool my_proc::evLoop(IServer* ps, uint16_t nHandle)
 
 ```bash
 git clone https://github.com/comarius/bunget
-cd bunget/src
-# Build the lib
-cd libbunget
-cmake .
+cmake . # This will build the library and the demo app
 make
-# Build the app
-cd ..
-cmake .
-make
-cd bin
-sudo ./bunget 0 # (hci device number)
+sudo ./src/bin/bunget 0 # (0 is hci device number)
 ```
 
 ```bash
-#
-# Prerequisites. Also required for new system
-#
-apt-get update
-apt-get install bluez # (needed for hciconfig utility for now)
-apt-get install cmake
-apt-get install g++
-apt-get install rfkill
-apt-get install libcrypto++-dev
+
 service bluetooth stop             # mandatory
 update-rc.d -f  bluetooth remove   # to make it permanent
 # on systemD use systemctl disable 'servicename'

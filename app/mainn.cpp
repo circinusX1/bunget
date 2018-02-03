@@ -204,7 +204,7 @@ my_proc::my_proc()
 */
 bool my_proc::initHciDevice(int devid, const char* devn)
 {
-
+#if 0
     char name[128];
     // system("service bluetoothd stop");
     // system("service bluetooth stop");
@@ -239,7 +239,7 @@ bool my_proc::initHciDevice(int devid, const char* devn)
 */
 
     printf("%s", "done dirty work\n");
-
+#endif
     return true;
 }
 
