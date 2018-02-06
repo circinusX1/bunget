@@ -5,7 +5,7 @@
 **/Makefile
 
 # Ignore artifact folders
-app/bin/
+**/bin/
 link/
 
 # Ignore Netbeans files

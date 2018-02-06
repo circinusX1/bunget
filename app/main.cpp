@@ -132,7 +132,7 @@ int main(int n, char* v[])
     if(getuid()!=0)
     {
         std::cout << "run under sudo credentials or setcap bunget !\n";
-        //return -1;
+        return -1;
     }
 
     BtCtx*      ctx = BtCtx::instance();                // BT context
