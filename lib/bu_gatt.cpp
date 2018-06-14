@@ -5,7 +5,7 @@
     WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-    This program, or portions of it cannot be used in commercial
+    The library or code from is restricted to be used in commercial products
     products without the written consent of the author.
 
 */
