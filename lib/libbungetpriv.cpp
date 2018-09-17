@@ -100,12 +100,15 @@ void SrvDevice::run()
 #ifdef USE_UVLIB
     uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 #else
-    _hci->start(_respdelay);
-    _running = true;
-    _status = eRUNNING;
-    while(__alive)
+    if(_hci)
     {
-        _hci->pool();
+        _hci->start(_respdelay);
+        _running = true;
+        _status = eRUNNING;
+        while(__alive)
+        {
+            _hci->pool();
+        }
     }
     _status = eUNKNOWN;
 #endif
@@ -155,11 +158,16 @@ int     SrvDevice::advertise(int millis)
                 delete _hci;
                 _hci = 0;
                 _hcidev=-1;
+
             }
-            _gapp =  new bu_gap(_hci);
-            _gatt = new bu_gatt(_hci);
-            _gatt->setMaxMtu(_maxMtu);
-            _gapp->advertise(_name.c_str(), _services, _pin);
+            if(_hci)
+            {
+                _gapp =  new bu_gap(_hci);
+                _gatt = new bu_gatt(_hci);
+                _gatt->setMaxMtu(_maxMtu);
+                _gapp->advertise(_name.c_str(), _services, _pin);
+
+            }
         }
     }
     else

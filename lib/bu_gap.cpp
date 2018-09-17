@@ -53,16 +53,24 @@ void bu_gap::advertise(const std::string& name,
     {
         bybuff  advData;
         bybuff  scn;
-        size_t  nservs = _hci->srv()->nServices();
-
+        size_t  nservs =  _hci->srv()->nServices();
+/*
+        for(const auto  &s : srvs)
+        {
+            GattSrv* ps = dynamic_cast<GattSrv*>(s);
+            if(ps->_default)
+                continue;
+            ++nservs;
+        }
+*/
 
         advData << uint8_t(0x2) << uint8_t(0x1) << uint8_t(0x6);
         advData<<(uint8_t(1 + 2 * nservs)) << (uint8_t(0x3));
         for(const auto  &s : srvs)
         {
             GattSrv* ps = dynamic_cast<GattSrv*>(s);
-            if(ps->_default)
-                continue;
+        //    if(ps->_default)
+         //       continue;
             ps->debug();
             uint16_t uid = ps->_cuid.as16();
             advData << uid;

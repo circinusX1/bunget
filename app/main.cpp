@@ -25,6 +25,23 @@
         0x3401
         0x3402
 
+
+   QT CREATOR APPDEMO
+Go to Tools-> Options-> Environment
+In the Tab General under **System** Group there is a
+Terminal Option.
+The default value is set to/usr/bin/xterm -e.
+Replace it with /usr/bin/xterm -e sudo or
+/usr/bin/gnome-terminal -x sudo.
+Press Apply and OK Buttons.
+Under Mode Selector click on Projects,
+select Run Option. Under Run Group Box
+select Run in Terminal
+
+
+/etc/sudoers using sudo visudo <- /usr/bin/gnome-terminal
+
+
 */
 
 // test echo
@@ -129,11 +146,14 @@ int main(int n, char* v[])
         std::cout << "sudo bunget hcidev#, pass device id as 0,1,2.. as first argument!\n";
         return -1;
     }
+    /*
     if(getuid()!=0)
     {
         std::cout << "run under sudo credentials or setcap bunget !\n";
         return -1;
     }
+    */
+
 
     BtCtx*      ctx = BtCtx::instance();                // BT context
     my_proc     procedure;                              // this procedure
