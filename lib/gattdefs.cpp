@@ -66,6 +66,13 @@ void GattSrv::_ctor(GHandler* pci, uint8_t props, uint8_t secure, uint8_t format
     pci->_hndl   = _srv->add_gattel(pci);
     this->_lasthndl = pci->_hndl; //mcooo
     pci->_hparent = this->_hndl;
+    pci->_length = length;
+    pci->_value = new uint8_t[MAX_GATTLEN];
+    ::memset(pci->_value,0,MAX_GATTLEN);
+    if(val)
+    {
+        ::memcpy(pci->_value,val,length);
+    }
 }
 
 /****************************************************************************************
@@ -308,6 +315,7 @@ int GHandler::_put_value(const uint8_t* v, size_t length)
     if(_value==0)
     {
         _value = new uint8_t[MAX_GATTLEN];
+        ::memset(_value,0,MAX_GATTLEN);
     }
     _length = std::min(length, (size_t)MAX_GATTLEN);
     ::memcpy(_value, v, _length);
