@@ -44,7 +44,7 @@ inline size_t tick_count()
 
 /****************************************************************************************
 */
-SrvDevice::SrvDevice(ISrvProc* proc, int& hcid, const char* name, int delay, bool advall):_cb_proc(proc),
+SrvDevice::SrvDevice(ISrvProc* proc, int& hcid, const char* name, int delay, bool advall, bool defaults):_cb_proc(proc),
                     _def(false),_hcidev(hcid),_advinterval(MIN_ADV_INTERVAL),_advall(advall),_notyinterval(MIN_NOTY_INTERVAL)
 {
     _gapp = 0;
@@ -57,7 +57,7 @@ SrvDevice::SrvDevice(ISrvProc* proc, int& hcid, const char* name, int delay, boo
     _advstatus = 0;
     _scanrespdatastatus = 0;
     _advstatus = 0;
-    _defaults = false;
+    _defaults = !defaults;
     _status = eOFFLINE;
     _maxMtu = 23;
     _pcrypt = _cb_proc->get_crypto();
@@ -663,11 +663,12 @@ IServer* ContextImpl::new_server(ISrvProc* proc,
                                 int hcidev, 
                                 const char* name, 
                                 int tweak_delay,
-                                bool advall)
+                                bool advall,
+                                bool defaults)
 {
     if(_adapters.find(hcidev) == _adapters.end())
     {
-        SrvDevice* p = new SrvDevice(proc, hcidev, name, tweak_delay, advall);
+        SrvDevice* p = new SrvDevice(proc, hcidev, name, tweak_delay, advall, defaults);
         if(hcidev<0){
             delete p;
             return 0;

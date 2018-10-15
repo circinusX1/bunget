@@ -268,7 +268,15 @@ int bu_gatt::_group_q(const sdata& data, bybuff& ret)
             ret << uint16_t(ps->_lasthndl);
 
             TRACE(" adding service " << std::hex << int(ps->_hndl) << std::dec<<"\n");
-            ret << ps->_cuid;
+
+            // can not mix up 128 bit uuids with 16 bit
+            assert((lengthPerService == 20 && !ps->_cuid.is_16()) || (lengthPerService == 6 && ps->_cuid.is_16()));
+            if(ps->_cuid.is_16()){
+                ret << ps->_cuid.as16();
+            } else {
+                ret << ps->_cuid.as128();
+            }
+
 
             if(--elems==0)
                 break;

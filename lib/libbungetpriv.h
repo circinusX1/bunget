@@ -45,7 +45,8 @@ enum {
 class SrvDevice : public IServer, public hci_event
 {
 public:
-    SrvDevice(ISrvProc* proc, int& hcid, const char* name, int delay=0, bool advall=false);
+    // defaults enables the default services 1800 and 1801. This just works with 16 bit UUID services
+    SrvDevice(ISrvProc* proc, int& hcid, const char* name, int delay=0, bool advall=false, bool defaults = true);
     ~SrvDevice();
     void   power_switch(bool on);
     int    advertise(int millis);
@@ -196,7 +197,7 @@ public:
             delete a.second;
 
     }
-    virtual IServer* new_server(ISrvProc* proc, int hcidev, const char* name, int tweak_delay=0, bool advall=false);
+    virtual IServer* new_server(ISrvProc* proc, int hcidev, const char* name, int tweak_delay=0, bool advall=false, bool defaults = true);
  private:
     std::map<int,IServer*> _adapters;
 };

@@ -240,7 +240,7 @@ public:
     virtual ~BtCtx();
 
     static BtCtx* instance();
-    virtual IServer* new_server(ISrvProc* proc, int hcidev, const char* name, int tweak_delay=0, bool advall=0)=0;
+    virtual IServer* new_server(ISrvProc* proc, int hcidev, const char* name, int tweak_delay=0, bool advall=0, bool defaults = true)=0;
 };
 
 /**

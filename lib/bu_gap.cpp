@@ -11,6 +11,7 @@
 */
 #include <dlfcn.h>
 #include <vector>
+#include <assert.h>
 #include "libbungetpriv.h"
 #include "bu_gap.h"
 #include "uguid.h"
@@ -64,16 +65,37 @@ void bu_gap::advertise(const std::string& name,
         }
 */
 
+        const uint8_t adTypeUUID16Bit = 0x3;
+        const uint8_t adTypeUUID128Bit = 0x7;
+
+
         advData << uint8_t(0x2) << uint8_t(0x1) << uint8_t(0x6);
-        advData<<(uint8_t(1 + 2 * nservs)) << (uint8_t(0x3));
+        advData<<(uint8_t(1 + 2 * nservs));
+
+        bool is16 = true;
+        if(!srvs.empty() && dynamic_cast<GattSrv*>(srvs[0])->_cuid.is_16())
+        {
+            advData << adTypeUUID16Bit;
+        } else {
+            advData << adTypeUUID128Bit;
+            is16 = false;
+        }
         for(const auto  &s : srvs)
         {
             GattSrv* ps = dynamic_cast<GattSrv*>(s);
         //    if(ps->_default)
          //       continue;
             ps->debug();
-            uint16_t uid = ps->_cuid.as16();
-            advData << uid;
+            if (ps->_cuid.is_16()) {
+                assert(is16);
+                // can not mix up 16 and 128 bit uuids
+                uint16_t uid = ps->_cuid.as16();
+                advData << uid;
+            } else {
+                assert(!is16);
+                uint128_t uid = ps->_cuid.as128();
+                advData << uid;
+            }
         }
         scn<<uint8_t(1+name.length())<<uint8_t(0x8);
         scn<<name;

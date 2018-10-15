@@ -170,7 +170,7 @@ int main(int n, char* v[])
 #ifdef XECHO_BLENO
         IServer* BS =  ctx->new_server(&procedure, dev, "echo", srdel, true);
 #else
-        IServer* BS =  ctx->new_server(&procedure, dev, "bunget", srdel, true);
+        IServer* BS =  ctx->new_server(&procedure, dev, "bunget", srdel, true, true);
 #endif
 #if 0   // not tested !!!
         //BS->set_name("advname"); // this is the bt name.
