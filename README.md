@@ -5,6 +5,9 @@
 ##### Version 1.2.0, Nov 13 2017
 ###### Bunget, read 'ge' as in George
 
+### Ad.
+####  R-PI Preloaded SDCard at https://www.redypis.org
+
 ### Description:
 
 BUNGET is a C++ library for Linux which help to write GAP/GATT servers (Bluetooth 4.0). It provides abstract classes and methods to create GATT services, characteristics (READ/WRITE/NOTIFICATIONS). The library does not require the Bluez, but it requires some bluetooth utilities. The library was written from scratch. The idea of writing 'yet another BTLE implemetation' came after I spend days and days trying Bluez and Bleno. I could not get Blues working programatically and easy. Bleno is terible slow and tremendous resource eater, also brings entire java enciclopedia along with. 
