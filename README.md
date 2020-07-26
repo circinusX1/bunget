@@ -5,6 +5,9 @@
 ##### Version 1.2.0, Nov 13 2017
 ###### Bunget, read 'ge' as in George
 
+###  Support Me during Covid Eons
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=L9RVWU5NUZ4YG)   [donations are taken care by meeiot domain]
+
 ### Ad.
 ####  R-PI Preloaded SDCard at https://www.redypis.org
 
