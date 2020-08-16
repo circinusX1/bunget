@@ -46,7 +46,7 @@ I recommend to test your environment using [arduiuipush](https://play.google.com
 
 ## Block Diagram:
 
-![alt text](https://github.com/comarius/bunget/blob/master/docs/bungblk.png "bunget-lib")
+![alt text](https://github.com/circinusX1/bunget/blob/master/docs/bungblk.png "bunget-lib")
 
 
 #### Demo video. If the image does not work use this link: http://209.177.145.195/share/bunget.mov
@@ -83,7 +83,7 @@ Check also: ArduUiPush demo: https://www.youtube.com/watch?v=Fw4yCe2ejNw
 
 ## Class Diagram
 
-![alt text](https://github.com/comarius/bunget/blob/master/docs/bungetl.png "bunget-lib")
+![alt text](https://github.com/circinusX1/bunget/blob/master/docs/bungetl.png "bunget-lib")
 
 
 ## Issues Tweaks 
